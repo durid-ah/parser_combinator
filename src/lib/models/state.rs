@@ -10,6 +10,7 @@ pub struct State<R, T, E> {
 
 // TODO: Clone or Copy or Ref?
 impl<R, T, E> State<R, T, E> {
+
    pub fn new_err(self, err: E) -> Self {
       Self {
          index : self.index,
