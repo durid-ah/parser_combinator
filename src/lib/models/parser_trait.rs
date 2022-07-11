@@ -1,5 +1,5 @@
 
-use super::{state::{State}, cardinality::Cardinality};
+use super::{state::{State, ParserResult}, cardinality::Cardinality, parse_test::Parser};
 
 type StringState = State<String, String, String>;
 
@@ -13,14 +13,9 @@ impl Str {
    }
 }
 
-impl Parse for Str {
-   type R1 = String;
-   type R2 = String;
-   type T = String;
-   type E1 = String;
-   type E2 = String;
+impl Transform<String,String,String,String,String> for Str {
 
-   fn transform(&self, state: StringState) -> StringState {
+   fn transform(&mut self, state: StringState) -> StringState {
       let contains_error = state.result
          .as_ref()
          .and_then(|r| Some(r.is_err()))
@@ -51,21 +46,23 @@ impl Parse for Str {
       }
    }
 
-   fn run(&self, target: String) -> StringState {
+   fn run(&mut self, target: String) -> StringState {
       let initial_state = State{target, index: 0, result: None };
       return self.transform(initial_state);
    }
 }
 
-pub trait Parse {
-   type R1;
-   type R2;
-   type T;
-   type E1;
-   type E2;
 
-   fn transform(&self, state: State<Self::R1, Self::T, Self::E1>) -> State<Self::R2, Self::T, Self::E2>;
-   fn run(&self, target: Self::T) -> State<Self::R2, Self::T, Self::E2>;
+fn map_ok<'a, R1,R2,T,E1,E2,S,F>(parser: Box<dyn Transform<R1,R2,T,E1,E2>>, map_fn: F)
+   where F: FnMut(ParserResult<R2, E2>) -> Parser<'a,R1,S,T,E1,E2> {
+
+   todo!("Finished polishing the Parser struct")
+}
+
+
+pub trait Transform<R1,R2,T,E1,E2> {
+   fn transform(&mut self, state: State<R1, T, E1>) -> State<R2, T, E2>;
+   fn run(&mut self, target: T) -> State<R2, T, E2>;
 }
 
 
@@ -80,25 +77,7 @@ pub trait Parse {
 //       where F: FnMut(ParserResult<Self::R2, Self::E2>) -> Box<dyn Parser<R1=Self::R2, R2=S, T=Self::T, E1 = Self::E1, E2 = Self::E2>>;
 // }
 
-pub trait Map {
-   type R1;
-   type R2;
-   type T;
-   type E1;
-   type E2;
-
-   fn map_ok<S>(&self) -> Box<dyn Parse<R1=Self::R2, R2=S, T=Self::T, E1 = Self::E1, E2 = Self::E2>>;
-   fn map_err<E>(&self) -> Box<dyn Parse<R1=Self::R1, R2=Self::R2, T=Self::T, E1 = Self::E1, E2 = E>>;
-}
 
 #[cfg(test)]
 mod tests {
-   //  use super::Parser;
-
-
-   // #[test]
-   // fn test_init() {
-   //    let p: Parser<String, String, String, String, String> = 
-   //       Parser::new(Box::new(|x| x ));
-   // }
 }
