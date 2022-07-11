@@ -1,10 +1,6 @@
 
 use super::{state::{State}, cardinality::Cardinality};
 
-
-
-
-
 type StringState = State<String, String, String>;
 
 pub struct  Str {
@@ -51,46 +47,15 @@ impl Parse for Str {
       return State { 
          index: start_index, 
          target: state.target, 
-         result: Some(Err(String::from(""))) 
+         result: Some(Err(String::from(""))) // TODO: Add error message
       }
    }
 
    fn run(&self, target: String) -> StringState {
-        todo!()
+      let initial_state = State{target, index: 0, result: None };
+      return self.transform(initial_state);
    }
 }
-
-// impl Str 
-// {
-//    pub fn new() -> Self {
-
-//       // let transformer_fn = |state : StringState| -> StringState {
-//       //    let contains_error = state.result
-//       //       .as_ref()
-//       //       .and_then(|r| Some(r.is_err()))
-//       //       .unwrap_or(false);
-         
-//       //    if contains_error {
-//       //       return state;
-//       //    }
-
-//       //    let start_index = state.index;
-//       //    let sliced_target = &state.target.as_str()[start_index..];
-//       //    if sliced_target.len() == 0 {
-//       //       return state.new_err(String::from("Str: Unexpected end of input"))
-//       //    }
-
-//       //    state
-//       // };
-
-//       // let transformer_fn = Box::new(transformer_fn);
-
-//       // Self { transformer_fn }
-//    }
-// }
-
-// <R1 = <Self as Parser>::R1, R2 = <Self as Parser>::R2, T = <Self as Parser>::T, E1 = <Self as Parser>::E1, E2 = <Self as Parser>::E2>
-// <R1 = <Self as Parser>::R1, R2 = <Self as Parser>::R2, T = <Self as Parser>::T, E1 = <Self as Parser>::E1, E2 = <Self as Parser>::E2>
 
 pub trait Parse {
    type R1;
