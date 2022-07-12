@@ -1,4 +1,4 @@
-use crate::models::{parser_trait::Transform, state::State, cardinality::Cardinality};
+use crate::models::{parser_trait::Parse, state::State, cardinality::Cardinality};
 
 type StringState = State<String, String, String>;
 
@@ -12,7 +12,7 @@ impl Str {
    }
 }
 
-impl Transform<String,String,String,String,String> for Str {
+impl Parse<String,String,String,String,String> for Str {
 
    fn transform(&mut self, state: StringState) -> StringState {
       let contains_error = state.result
