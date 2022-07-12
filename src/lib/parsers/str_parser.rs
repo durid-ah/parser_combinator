@@ -1,4 +1,4 @@
-use crate::models::{parser_trait::Parse, state::State, cardinality::Cardinality};
+use crate::models::{parser_traits::Parse, state::State, cardinality::Cardinality};
 
 type StringState = State<String, String, String>;
 
