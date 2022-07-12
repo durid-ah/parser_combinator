@@ -1,11 +1,8 @@
+use super::{state::{State, ParserResult}, parser::Parser};
 
-use super::{state::{State, ParserResult}, cardinality::Cardinality, parse_test::Parser};
-
-
-
-
-fn map_ok<'a, R1,R2,T,E1,E2,S,F>(parser: Box<dyn Transform<R1,R2,T,E1,E2>>, map_fn: F)
-   where F: FnMut(ParserResult<R2, E2>) -> Parser<'a,R1,S,T,E1,E2> {
+fn map_ok<'a, R1,R2,T,E1,E2,S,F,I>(parser: I, map_fn: F)
+   where F: FnMut(ParserResult<R2, E2>) -> Parser<'a,R1,S,T,E1,E2>,
+   I: Transform<R1,R2,T,E1,E2> {
 
    todo!("Finished polishing the Parser struct")
 }
