@@ -2,6 +2,7 @@ use crate::models::{parser_traits::Parse, state::State, cardinality::Cardinality
 
 type StringState = State<String, String, String>;
 
+#[derive(Clone)]
 pub struct  Str {
    pub to_match: String
 }
