@@ -1,7 +1,4 @@
-use super::{state::{State, ParserResult}, parser::Parser};
-
-
-
+use super::state::State;
 
 pub trait Parse<R1,R2,T,E1,E2> {
    fn transform(&mut self, state: State<R1, T, E1>) -> State<R2, T, E2>;
