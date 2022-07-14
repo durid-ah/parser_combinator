@@ -38,4 +38,22 @@ pub fn chain_parser<'a,I,F,R1,R2,T,E1,E2,S>(mut parser: I, mut chain_fn: F) -> B
    Box::new(Parser::new(Box::new(transformer)))
 } 
 
-// TODO: Test
+#[cfg(test)]
+mod tests {
+    use crate::parsers::str_parser::Str;
+
+    use super::chain_parser;
+
+   #[test]
+   fn chain_test() {
+      let str_1 = Str::new("Stuff".to_owned());
+      let str_2 = Str::new("Stuff".to_owned());
+
+      let mut chained = 
+         chain_parser(str_1, move |_| Box::new(str_2.clone()));
+
+      let res = chained.run("StuffStuff".to_owned());
+      assert!(res.result.unwrap().is_ok())
+   }
+}
+
