@@ -41,13 +41,50 @@ impl Parse<String,String,String,String,String> for Str {
 
       return State { 
          index: start_index, 
-         target: state.target, 
-         result: Some(Err(String::from(""))) // TODO: Add error message
+         target: state.target.clone(), // TODO: Change to a ref to prevent copies
+         result: Some(Err(format!("Str: Tried to match {}, but got {}", self.to_match, state.target)))
       }
    }
 
    fn run(&mut self, target: String) -> StringState {
       let initial_state = State{target, index: 0, result: None };
       return self.transform(initial_state);
+   }
+}
+
+#[cfg(test)]
+mod tests {
+   use crate::models::parser_traits::Parse;
+   use super::Str;
+
+   #[test]
+   fn str_success_exact_parse() {
+      let mut parser = Str::new("Test".to_owned());
+      let res = parser.run("Test".to_owned());
+      assert!(res.result.unwrap().is_ok());
+      assert_eq!(res.index, 4);
+   }
+
+   #[test]
+   fn str_success_partial_parse() {
+      let mut parser = Str::new("Test".to_owned());
+      let res = parser.run("Tester".to_owned());
+      assert!(res.result.unwrap().is_ok());
+      assert_eq!(res.index, 4);
+   }
+
+   #[test]
+   fn str_fail_no_match_parse() {
+      let mut parser = Str::new("Test".to_owned());
+      let res = parser.run("Abcde".to_owned());
+      assert!(res.result.unwrap().is_err());
+      assert_eq!(res.index, 0);
+   }
+
+   #[test]
+   fn str_fail_short_target_parse() {
+      let mut parser = Str::new("Test".to_owned());
+      let res = parser.run("T".to_owned());
+      assert!(res.result.unwrap().is_err());
    }
 }
