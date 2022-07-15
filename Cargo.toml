@@ -10,3 +10,4 @@ name = "parser_combinator"
 path = "src/lib/lib.rs"
 
 [dependencies]
+regex = "1.6.0"
