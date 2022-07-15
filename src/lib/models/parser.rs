@@ -56,7 +56,7 @@ mod tests {
 
    #[test]
    fn some_test() {
-      let p: Parser<String, String, String, String, String> = 
+      let _: Parser<String, String, String, String, String> = 
          Parser::new(Box::new(|state| {
             if state.target == "cat" {
                return State{ 
