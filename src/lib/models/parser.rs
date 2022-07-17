@@ -13,7 +13,11 @@ impl<'a, R1, R2, T, E1, E2> Parser<'a, R1, R2, T, E1, E2> {
    /// 
    /// A parser that tries to match the word "cat" in the target and updates the index to the character after
    /// ```
-   /// Parser::new(Box::new(|state| {
+   /// use parser_combinator::models::parser::Parser;
+   /// use parser_combinator::models::state::State;
+   /// use parser_combinator::models::cardinality::Cardinality;
+   /// 
+   /// Parser::new(Box::new(|state: State<String,String,String>| {
    ///    if state.target == "cat" {
    ///       return State{ 
    ///          index: 3, 
