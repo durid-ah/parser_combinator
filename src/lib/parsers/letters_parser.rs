@@ -55,3 +55,25 @@ impl Parse<String,String,String,String,String> for Letters {
       return self.transform(initial_state);
    }
 }
+
+#[cfg(test)]
+mod tests {
+    use crate::models::parser_traits::Parse;
+    use super::Letters;
+
+   #[test]
+   fn digit_success_run() {
+      let mut p = Letters::new();
+      let res = p.run("abcd1s".to_owned());
+      assert!(res.result.unwrap().unwrap().unwrap_one() == "abcd");
+      assert!(res.index == 4);
+   }
+
+   #[test]
+   fn digit_fail_run() {
+      let mut p = Letters::new();
+      let res = p.run("123s".to_owned());
+      assert!(res.result.unwrap().is_err());
+      assert!(res.index == 0);
+   }
+}
