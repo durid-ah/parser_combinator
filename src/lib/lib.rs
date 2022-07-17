@@ -14,6 +14,7 @@
 //    - Many
 //    - One
 
+pub mod bit_parsers;
 pub mod collection_parsers;
 pub mod parsers;
 pub mod parser_helpers;
