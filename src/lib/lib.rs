@@ -13,6 +13,8 @@
 // Cardinal Result
 //    - Many
 //    - One
+
+pub mod collection_parsers;
 pub mod parsers;
 pub mod parser_helpers;
 pub mod models;
