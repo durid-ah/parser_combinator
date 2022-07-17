@@ -8,7 +8,6 @@ pub struct State<R, T, E> {
    pub result: ParserResult<R, E>
 }
 
-// TODO: Clone or Copy or Ref?
 impl<R, T, E> State<R, T, E> {
 
    pub fn new_err(self, err: E) -> Self {
@@ -17,5 +16,22 @@ impl<R, T, E> State<R, T, E> {
          target: self.target,
          result: Some(Err(err))
       }
+   }
+
+   pub fn from_err_state<R2>(state: State<R2,T,E>) -> Self {
+      if state.result.is_none() {
+         panic!("from_err_state: result can't be none")
+      }
+
+      if state.result.as_ref().unwrap().is_ok() {
+         panic!("from_err_state: result can't be ok")
+      }
+
+      let err_res: Result<Cardinality<R>, E> = match  state.result.unwrap() {
+         Err(err) => Err(err),
+         _ => panic!("from_err_state: result must be err")
+      };
+
+      Self { index: state.index, target: state.target, result: Some(err_res) }
    }
 }
