@@ -42,12 +42,6 @@ impl<'a, R1, R2, T, E1, E2> Parse<R1, R2, T, E1, E2> for Parser<'a, R1, R2, T, E
    fn transform(&mut self, state: State<R1, T, E1>) -> State<R2, T, E2> {
       (self.transformer_fn)(state)
    }
-
-   /// Run the parser with an initial `None` result
-   fn run(&mut self, target: T) -> State<R2, T, E2> {
-      let initial_state = State{target, index: 0, result: None };
-      self.transform(initial_state)
-   }
 }
 
 
@@ -62,7 +56,7 @@ mod tests {
    fn some_test() {
       let _: Parser<String, String, String, String, String> = 
          Parser::new(Box::new(|state| {
-            if state.target == "cat" {
+            if *state.target == "cat" {
                return State{ 
                   index: 3, 
                   target: state.target, 
