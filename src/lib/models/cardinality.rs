@@ -1,5 +1,5 @@
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum Cardinality<R> {
    One(R),
    Many(Vec<R>)
