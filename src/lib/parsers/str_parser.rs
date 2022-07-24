@@ -1,6 +1,10 @@
-use crate::models::{parser_traits::Parse, state::State, cardinality::Cardinality};
+use std::rc::Rc;
 
-type StringState = State<String, String, String>;
+use crate::models::parser_traits::Parse;
+use crate::models::state::State;
+use crate::models::cardinality::Cardinality;
+
+type StringState<'state> = State<String, &'state str, String>;
 
 #[derive(Clone)]
 pub struct  Str {
@@ -13,9 +17,10 @@ impl Str {
    }
 }
 
-impl Parse<String,String,String,String,String> for Str {
 
-   fn transform(&mut self, state: StringState) -> StringState {
+impl Parse<String,String,&str,String,String> for Str {
+
+   fn transform<'s>(&mut self, state: StringState<'s>) -> StringState<'s> {
       let contains_error = state.result
          .as_ref()
          .and_then(|r| Some(r.is_err()))
@@ -26,7 +31,7 @@ impl Parse<String,String,String,String,String> for Str {
       }
 
       let start_index = state.index;
-      let sliced_target = &state.target.as_str()[start_index..];
+      let sliced_target = &state.target[start_index..];
       if sliced_target.len() == 0 {
          return state.new_err(String::from("Str: Unexpected end of input"))
       }
@@ -41,14 +46,9 @@ impl Parse<String,String,String,String,String> for Str {
 
       return State { 
          index: start_index, 
-         target: state.target.clone(), // TODO: Change to a ref to prevent copies
+         target: Rc::clone(&state.target),
          result: Some(Err(format!("Str: Tried to match {}, but got {}", self.to_match, state.target)))
       }
-   }
-
-   fn run(&mut self, target: String) -> StringState {
-      let initial_state = State{target, index: 0, result: None };
-      return self.transform(initial_state);
    }
 }
 
@@ -60,7 +60,7 @@ mod tests {
    #[test]
    fn str_success_exact_parse() {
       let mut parser = Str::new("Test".to_owned());
-      let res = parser.run("Test".to_owned());
+      let res = parser.run("Test");
       assert!(res.result.unwrap().is_ok());
       assert_eq!(res.index, 4);
    }
@@ -68,7 +68,7 @@ mod tests {
    #[test]
    fn str_success_partial_parse() {
       let mut parser = Str::new("Test".to_owned());
-      let res = parser.run("Tester".to_owned());
+      let res = parser.run("Tester");
       assert!(res.result.unwrap().is_ok());
       assert_eq!(res.index, 4);
    }
@@ -76,7 +76,7 @@ mod tests {
    #[test]
    fn str_fail_no_match_parse() {
       let mut parser = Str::new("Test".to_owned());
-      let res = parser.run("Abcde".to_owned());
+      let res = parser.run("Abcde");
       assert!(res.result.unwrap().is_err());
       assert_eq!(res.index, 0);
    }
@@ -84,7 +84,7 @@ mod tests {
    #[test]
    fn str_fail_short_target_parse() {
       let mut parser = Str::new("Test".to_owned());
-      let res = parser.run("T".to_owned());
+      let res = parser.run("T");
       assert!(res.result.unwrap().is_err());
    }
 }
