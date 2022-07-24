@@ -1,10 +1,12 @@
+use std::rc::Rc;
 use super::cardinality::Cardinality;
 
 pub type  ParserResult<R, E> = Option<Result<Cardinality<R>, E>>;
 
+#[derive(Clone)]
 pub struct State<R, T, E> {
    pub index: usize,
-   pub target: T,
+   pub target: Rc<T>,
    pub result: ParserResult<R, E>
 }
 
@@ -32,6 +34,6 @@ impl<R, T, E> State<R, T, E> {
          _ => panic!("from_err_state: result must be err")
       };
 
-      Self { index: state.index, target: state.target, result: Some(err_res) }
+      Self { index: state.index, target: Rc::clone(&state.target), result: Some(err_res) }
    }
 }
