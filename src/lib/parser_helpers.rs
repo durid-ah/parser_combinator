@@ -52,7 +52,7 @@ mod tests {
       let mut chained = 
          chain_parser(str_1, move |_| Box::new(str_2.clone()));
 
-      let res = chained.run("StuffStuff".to_owned());
+      let res = chained.run("StuffStuff");
       assert!(res.result.unwrap().is_ok())
    }
 }
