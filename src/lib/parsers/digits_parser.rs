@@ -49,11 +49,6 @@ impl Parse<String,String,String,String,String> for Digits {
          result: Some(Ok(One(match_val.as_str().to_owned()))) 
       }
    }
-
-   fn run(&mut self, target: String) -> State<String, String, String> {
-      let initial_state = State{target, index: 0, result: None };
-      return self.transform(initial_state);   
-   }
 }
 
 #[cfg(test)]
