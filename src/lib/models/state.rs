@@ -36,4 +36,13 @@ impl<R, T, E> State<R, T, E> {
 
       Self { index: state.index, target: Rc::clone(&state.target), result: Some(err_res) }
    }
+
+   /// Check if the result is an error type. Returns `false` if 
+   /// the result is `Ok()` or `None`
+   pub fn is_error(&self) -> bool {
+      self.result
+         .as_ref()
+         .and_then(|r| Some(r.is_err()))
+         .unwrap_or(false)
+   }
 }
