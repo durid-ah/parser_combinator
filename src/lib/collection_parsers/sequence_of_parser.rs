@@ -19,10 +19,7 @@ impl<R1,R2,T,E> SequenceOf<R1,R2,T,E> {
 
 impl<R1,R2,T,E> Parse<R1,R2,T,E,E> for SequenceOf<R1,R2,T,E> {
    fn transform(&mut self, state: State<R1, T, E>) -> State<R2, T, E> {
-      let contains_error = state.result
-         .as_ref()
-         .and_then(|r| Some(r.is_err()))
-         .unwrap_or(false);
+      let contains_error = state.is_error();
 
       if contains_error {
          return State::from_err_state(state)
