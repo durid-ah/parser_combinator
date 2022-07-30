@@ -3,23 +3,23 @@ use crate::models::parser_traits::Parse;
 use crate::models::state::State;
 use crate::models::cardinality::Cardinality;
 
-pub struct Many<R1, R2, T, E1, E2> {
-   parser: Box<dyn Parse<R1, R2, T, E1, E2>>
+pub struct Many<R1, R2, T> {
+   parser: Box<dyn Parse<R1, R2, T>>
 }
 
-impl<R1, R2, T, E1, E2> Many<R1, R2, T, E1, E2> {
-   pub fn new(parser: Box<dyn Parse<R1, R2, T, E1, E2>>) -> Self {
+impl<R1, R2, T> Many<R1, R2, T> {
+   pub fn new(parser: Box<dyn Parse<R1, R2, T>>) -> Self {
       Self { parser }
    }
 }
 
-impl<R1, R2, T, E1, E2> Parse<R1, R2, T, E1, E2> for Many<R1, R2, T, E1, E2> {
-   fn transform(&mut self, state: State<R1, T, E1>) -> State<R2, T, E2> {
+impl<R1, R2, T> Parse<R1, R2, T> for Many<R1, R2, T> {
+   fn transform(&mut self, state: State<R1, T>) -> State<R2, T> {
 
       let mut results: Vec<R2> = Vec::new();
       let target = Rc::clone(&state.target);
-      let mut final_state: State<R1, T, E1> = State {
-         index: state.index,
+      let mut final_state: State<R1, T> = State {
+         index: state.index, 
          target: Rc::clone(&state.target),
          result: state.result
       };
