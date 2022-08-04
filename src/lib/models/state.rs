@@ -1,18 +1,18 @@
-use std::{rc::Rc, error::Error};
+use std::rc::Rc;
 use super::cardinality::Cardinality;
 
-pub type  ParserResult<R, E> = Option<Result<Cardinality<R>, E>>;
+pub type  ParserResult<R> = Option<Result<Cardinality<R>, String>>;
 
 #[derive(Clone)]
 pub struct State<R, T> {
    pub index: usize,
    pub target: Rc<T>,
-   pub result: ParserResult<R, dyn Error>
+   pub result: ParserResult<R>
 }
 
 impl<R, T> State<R, T> {
 
-   pub fn new_err<E: Error>(self, err: E) -> Self {
+   pub fn new_err(self, err: String) -> Self {
       Self {
          index : self.index,
          target: self.target,
@@ -29,7 +29,7 @@ impl<R, T> State<R, T> {
          panic!("from_err_state: result can't be ok")
       }
 
-      let err_res: Result<Cardinality<R>, dyn Error> = match  state.result.unwrap() {
+      let err_res: Result<Cardinality<R>, String> = match  state.result.unwrap() {
          Err(err) => Err(err),
          _ => panic!("from_err_state: result must be err")
       };

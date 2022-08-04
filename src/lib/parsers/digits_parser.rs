@@ -13,8 +13,8 @@ impl Digits {
    }
 }
 
-impl Parse<String,String,String,String,String> for Digits {
-   fn transform(&mut self, state: State<String, String, String>) -> State<String, String, String> {
+impl Parse<String,String,String> for Digits {
+   fn transform(&mut self, state: State<String, String>) -> State<String, String> {
       let contains_error = state.result
          .as_ref()
          .and_then(|r| Some(r.is_err()))

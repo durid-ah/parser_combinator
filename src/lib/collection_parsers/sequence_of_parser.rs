@@ -3,12 +3,12 @@ use std::rc::Rc;
 use crate::models::{parser_traits::Parse, state::State};
 use crate::models::cardinality::Cardinality::{One, Many};
 
-pub struct SequenceOf<R1,R2,T,E> {
-   parsers: Vec<Box<dyn Parse<R1,R2,T,E,E>>>
+pub struct SequenceOf<R1,R2,T> {
+   parsers: Vec<Box<dyn Parse<R1,R2,T>>>
 }
 
-impl<R1,R2,T,E> SequenceOf<R1,R2,T,E> {
-   pub fn new(parsers: Vec<Box<dyn Parse<R1,R2,T,E,E>>>) -> Self {
+impl<R1,R2,T> SequenceOf<R1,R2,T> {
+   pub fn new(parsers: Vec<Box<dyn Parse<R1,R2,T>>>) -> Self {
       if parsers.is_empty() {
          panic!("SequenceOf: parsers must not be empty")
       }
@@ -17,8 +17,8 @@ impl<R1,R2,T,E> SequenceOf<R1,R2,T,E> {
    }
 }
 
-impl<R1,R2,T,E> Parse<R1,R2,T,E,E> for SequenceOf<R1,R2,T,E> {
-   fn transform(&mut self, state: State<R1, T, E>) -> State<R2, T, E> {
+impl<R1,R2,T> Parse<R1,R2,T> for SequenceOf<R1,R2,T> {
+   fn transform(&mut self, state: State<R1, T>) -> State<R2, T> {
       let contains_error = state.is_error();
 
       if contains_error {
@@ -27,7 +27,7 @@ impl<R1,R2,T,E> Parse<R1,R2,T,E,E> for SequenceOf<R1,R2,T,E> {
 
       let mut results: Vec<R2> = Vec::with_capacity(self.parsers.len());
 
-      let mut final_state: State<R1, T, E> = State {
+      let mut final_state: State<R1, T> = State {
          index: state.index,
          target: Rc::clone(&state.target),
          result: None

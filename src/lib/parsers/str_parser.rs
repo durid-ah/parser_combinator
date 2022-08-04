@@ -4,7 +4,7 @@ use crate::models::parser_traits::Parse;
 use crate::models::state::State;
 use crate::models::cardinality::Cardinality;
 
-type StringState<'state> = State<String, &'state str, String>;
+type StringState<'state> = State<String, &'state str>;
 
 #[derive(Clone)]
 pub struct  Str {
@@ -18,7 +18,7 @@ impl Str {
 }
 
 
-impl Parse<String,String,&str,String,String> for Str {
+impl Parse<String,String,&str> for Str {
 
    fn transform<'s>(&mut self, state: StringState<'s>) -> StringState<'s> {
       let contains_error = state.result
