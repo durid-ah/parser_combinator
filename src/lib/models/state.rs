@@ -12,8 +12,8 @@ pub struct State<R, T> {
 
 impl<R, T> State<R, T> {
 
-   pub fn new_err(self, err: String) -> Self {
-      Self {
+   pub fn new_err<R2>(self, err: String) -> State<R2, T> {
+      State {
          index : self.index,
          target: self.target,
          result: Some(Err(err))
