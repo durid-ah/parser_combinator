@@ -3,6 +3,8 @@ use crate::models::parser_traits::Parse;
 use crate::models::state::State;
 use crate::models::cardinality::Cardinality;
 
+// TODO: Test out parser
+
 pub struct ManyOne<R1, R2, T> {
    parser: Box<dyn Parse<R1, R2, T>>
 }
