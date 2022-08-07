@@ -1,6 +1,7 @@
 use super::{state::State, parser_traits::Parse};
 
-/// Parser: a generic parser container that implements the parser trait
+/// # Parser: 
+/// a generic parser container that implements the parser trait
 pub struct Parser<'a, R1, R2, T> {
    pub transformer_fn: Box<dyn FnMut(State<R1,T>) -> State<R2,T> + 'a>,
 }
