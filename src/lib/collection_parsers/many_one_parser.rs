@@ -4,6 +4,8 @@ use crate::models::state::State;
 use crate::models::cardinality::Cardinality;
 
 // TODO: Test out parser
+// TODO: Document the parser
+
 
 pub struct ManyOne<R1, R2, T> {
    parser: Box<dyn Parse<R1, R2, T>>
@@ -33,7 +35,7 @@ impl<R1, R2, T> Parse<R1, R2, T> for ManyOne<R1, R2, T> {
          match state.result.unwrap() {
             Ok(Cardinality::One(res)) => results.push(res),
             Ok(Cardinality::Many(mut res)) => results.append(&mut res),
-            Err(err) => {
+            Err(err) => { // TODO: Fix the bug
                return State {
                   index: state.index,
                   target: state.target,
