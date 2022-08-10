@@ -4,21 +4,21 @@ use crate::models::state::State;
 use std::rc::Rc;
 
 /// # Many:
-/// Attempts to parse zero or more of the specified Parser the parser 
+/// Attempts to parse zero or more of the specified Parser the parser
 /// will run until it encounters an error in the specified target
-/// 
+///
 /// ### Returns:
 /// A result of type [`Cardinality::Many`]
-/// 
+///
 /// ### Examples
-/// 
+///
 /// Basic Usage:
-/// 
+///
 /// ```
 /// use parser_combinator::collection_parsers::many_parser::Many;
 /// use parser_combinator::parsers::str_parser::Str;
 /// use parser_combinator::models::parser_traits::Parse;
-/// 
+///
 /// let str_parser = Str::new("Test".to_owned());
 /// let mut many = Many::new(Box::new(str_parser));
 /// let result = many.run("TestTestTest");
@@ -53,7 +53,7 @@ impl<R1, R2, T> Parse<R1, R2, T> for Many<R1, R2, T> {
             match state.result.unwrap() {
                 Ok(Cardinality::One(res)) => results.push(res),
                 Ok(Cardinality::Many(mut res)) => results.append(&mut res),
-                Err(_) => done = true
+                Err(_) => done = true,
             }
 
             final_state = State {
