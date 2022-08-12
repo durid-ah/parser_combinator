@@ -4,7 +4,6 @@ use crate::models::cardinality::Cardinality::{One, Many};
 use crate::models::parser_traits::Parse;
 use crate::models::state::State;
 
-// TODO: Test
 
 pub struct SepBy<R1,R2,T>{
    separator: Box<dyn Parse<R1, R2, T>>,
@@ -34,13 +33,12 @@ impl<R1,R2,T> Parse<R1,R2,T> for SepBy<R1,R2,T> {
 
       loop {
          let thing_we_want_state = self.separated.transform(final_state);
-
          match thing_we_want_state.result.unwrap() {
             Ok(One(res)) => results.push(res),
             Ok(Many(mut res)) => results.append(&mut res),
             Err(_) => {
                final_state = State {
-                  index: state.index,
+                  index: thing_we_want_state.index,
                   target: Rc::clone(&target),
                   result: None,
                };
@@ -57,7 +55,7 @@ impl<R1,R2,T> Parse<R1,R2,T> for SepBy<R1,R2,T> {
          let separator_state = self.separator.transform(final_state);
          if separator_state.result.unwrap().is_err() {
             final_state = State {
-               index: thing_we_want_state.index,
+               index: separator_state.index,
                target: Rc::clone(&target),
                result: None,
             };
@@ -65,7 +63,7 @@ impl<R1,R2,T> Parse<R1,R2,T> for SepBy<R1,R2,T> {
          }
 
          final_state = State {
-            index: thing_we_want_state.index,
+            index: separator_state.index,
             target: Rc::clone(&target),
             result: None,
          };
@@ -81,10 +79,42 @@ impl<R1,R2,T> Parse<R1,R2,T> for SepBy<R1,R2,T> {
 
 #[cfg(test)]
 mod tests {
+   use crate::parsers::str_parser::Str;
    use super::*;
 
    #[test]
-   fn test_name() {
-       
+   fn success() {
+      let comma = Str::new(",".to_owned());
+      let test_string = Str::new("Test".to_owned());
+      let mut sep_parser = SepBy::new(Box::new(comma), Box::new(test_string));
+      let result = sep_parser.run("Test,Test,Test");
+
+      assert!(result.result.is_some());
+      assert_eq!(result.result.unwrap().unwrap().unwrap_many().len(), 3);
+      assert_eq!(result.index, 14);
+   }
+
+   #[test]
+   fn ends_with_separator_success() {
+      let comma = Str::new(",".to_owned());
+      let test_string = Str::new("Test".to_owned());
+      let mut sep_parser = SepBy::new(Box::new(comma), Box::new(test_string));
+      let result = sep_parser.run("Test,Test,");
+
+      assert!(result.result.is_some());
+      assert_eq!(result.result.unwrap().unwrap().unwrap_many().len(), 2);
+      assert_eq!(result.index, 10);
+   }
+
+   #[test]
+   fn empty_success() {
+      let comma = Str::new(",".to_owned());
+      let test_string = Str::new("Test".to_owned());
+      let mut sep_parser = SepBy::new(Box::new(comma), Box::new(test_string));
+      let result = sep_parser.run("");
+
+      assert!(result.result.is_some());
+      assert_eq!(result.result.unwrap().unwrap().unwrap_many().len(), 0);
+      assert_eq!(result.index, 0);
    }
 }

@@ -67,6 +67,7 @@ mod tests {
         let str_parser = Str::new("Test".to_owned());
         let mut many_one = ManyOne::new(Box::new(str_parser));
         let result = many_one.run("TestTestTest");
+        
         assert!(result.result.is_some());
         assert_eq!(result.result.unwrap().unwrap().unwrap_many().len(), 3);
         assert_eq!(result.index, 12);
