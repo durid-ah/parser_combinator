@@ -33,40 +33,31 @@ impl<R1,R2,T> Parse<R1,R2,T> for SepBy<R1,R2,T> {
 
       loop {
          let thing_we_want_state = self.separated.transform(final_state);
-         match thing_we_want_state.result.unwrap() {
-            Ok(One(res)) => results.push(res),
-            Ok(Many(mut res)) => results.append(&mut res),
-            Err(_) => {
-               final_state = State {
-                  index: thing_we_want_state.index,
-                  target: Rc::clone(&target),
-                  result: None,
-               };
-               break;
-            }
-         }
-
          final_state = State {
             index: thing_we_want_state.index,
             target: Rc::clone(&target),
             result: None,
          };
 
-         let separator_state = self.separator.transform(final_state);
-         if separator_state.result.unwrap().is_err() {
-            final_state = State {
-               index: separator_state.index,
-               target: Rc::clone(&target),
-               result: None,
-            };
-            break;
+         match thing_we_want_state.result.unwrap() {
+            Ok(One(res)) => results.push(res),
+            Ok(Many(mut res)) => results.append(&mut res),
+            Err(_) => {
+
+               break;
+            }
          }
 
+         let separator_state = self.separator.transform(final_state);
          final_state = State {
             index: separator_state.index,
             target: Rc::clone(&target),
             result: None,
          };
+
+         if separator_state.result.unwrap().is_err() {
+            break;
+         }
       }
 
       return State {
