@@ -1,8 +1,31 @@
 use std::rc::Rc;
-
 use crate::models::{parser_traits::Parse, state::State};
 use crate::models::cardinality::Cardinality::{One, Many};
 
+
+/// # SequenceOf:
+/// Parse a sequence of parsers, if the parser fails it will return an error
+/// instead of the parsed values
+/// 
+/// ### Returns:
+/// A result of type [`Many`]
+///
+/// ### Examples
+///
+/// Basic Usage:
+///
+/// ```
+/// use parser_combinator::collection_parsers::sequence_of_parser::SequenceOf;
+/// use parser_combinator::parsers::str_parser::Str;
+/// use parser_combinator::models::parser_traits::Parse;
+///
+/// let comma = Str::new(",".to_owned());
+/// let test_string = Str::new("Test".to_owned());
+/// let mut seq_parser = SequenceOf::new(vec![Box::new(test_string)]);
+/// let result = seq_parser.run("Test,Test,Test");
+/// 
+/// assert!(result.result.is_some());
+/// ```
 pub struct SequenceOf<R1,R2,T> {
    parsers: Vec<Box<dyn Parse<R1,R2,T>>>
 }

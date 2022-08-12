@@ -7,6 +7,8 @@ use std::rc::Rc;
 /// Attempts to parse zero or more of the specified Parser the parser
 /// will run until it encounters an error in the specified target
 ///
+/// To parse at least on see [`super::many_one_parser::ManyOne`] 
+/// 
 /// ### Returns:
 /// A result of type [`Cardinality::Many`]
 ///

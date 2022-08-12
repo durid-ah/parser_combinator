@@ -4,7 +4,30 @@ use crate::models::cardinality::Cardinality::{One, Many};
 use crate::models::parser_traits::Parse;
 use crate::models::state::State;
 
-
+/// # SepByOne:
+/// Parse at least one value separated by a `separator` value
+/// 
+/// ### Returns:
+/// A result of type [`Many`]
+///
+/// ### Examples
+///
+/// Basic Usage:
+///
+/// ```
+/// use parser_combinator::collection_parsers::sep_by_one_parser::SepByOne;
+/// use parser_combinator::parsers::str_parser::Str;
+/// use parser_combinator::models::parser_traits::Parse;
+///
+/// let comma = Str::new(",".to_owned());
+/// let test_string = Str::new("Test".to_owned());
+/// let mut sep_parser = SepByOne::new(Box::new(comma), Box::new(test_string));
+/// let result = sep_parser.run("Test,Test,Test");
+/// 
+/// assert!(result.result.is_some());
+/// assert_eq!(result.result.unwrap().unwrap().unwrap_many().len(), 3);
+/// assert_eq!(result.index, 14);
+/// ```
 pub struct SepByOne<R1,R2,T>{
    separator: Box<dyn Parse<R1, R2, T>>,
    separated: Box<dyn Parse<R1,R2,T>>

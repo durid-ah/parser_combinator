@@ -4,13 +4,43 @@ use crate::models::cardinality::Cardinality::{One, Many};
 use crate::models::parser_traits::Parse;
 use crate::models::state::State;
 
-
+/// # SepBy:
+/// Parse zero or more values separated by a `separator` value, the parser
+/// will run until it fails to parse the next value but will not return any
+/// error message instead it will return the parsed values
+/// 
+/// ### Returns:
+/// A result of type [`Many`]
+///
+/// ### Examples
+///
+/// Basic Usage:
+///
+/// ```
+/// use parser_combinator::collection_parsers::sep_by_parser::SepBy;
+/// use parser_combinator::parsers::str_parser::Str;
+/// use parser_combinator::models::parser_traits::Parse;
+///
+/// let comma = Str::new(",".to_owned());
+/// let test_string = Str::new("Test".to_owned());
+/// let mut sep_parser = SepBy::new(Box::new(comma), Box::new(test_string));
+/// let result = sep_parser.run("Test,Test,Test");
+/// 
+/// assert!(result.result.is_some());
+/// assert_eq!(result.result.unwrap().unwrap().unwrap_many().len(), 3);
+/// assert_eq!(result.index, 14);
+/// ```
 pub struct SepBy<R1,R2,T>{
    separator: Box<dyn Parse<R1, R2, T>>,
    separated: Box<dyn Parse<R1,R2,T>>
 }
 
 impl<R1,R2,T> SepBy<R1,R2,T> {
+   /// Instantiate a [`SepBy`] parser 
+   /// 
+   /// ## Args:
+   /// * `separator` - A parser that will separate the needed value
+   /// * `separated` - The parser for the needed value separated by the `separator`
    pub fn new(separator: Box<dyn Parse<R1, R2, T>>, separated: Box<dyn Parse<R1,R2,T>>) -> Self {
       Self { separator, separated }
    } 

@@ -3,9 +3,32 @@ use crate::models::parser_traits::Parse;
 use crate::models::state::State;
 use std::rc::Rc;
 
-// TODO: test failed scenario
-// TODO: Document the parser
-
+/// # ManyOne:
+/// Attempts to parse at least one instance of the specified Parser
+/// the parser will run until it encounters an error in the specified target
+/// if the parser does not find any values it will return an error
+/// 
+/// To parse zero or more see [`super::many_parser::Many`] 
+/// 
+/// ### Returns:
+/// A result of type [`Cardinality::Many`]
+///
+/// ### Examples
+///
+/// Basic Usage:
+///
+/// ```
+/// use parser_combinator::collection_parsers::many_one_parser::ManyOne;
+/// use parser_combinator::parsers::str_parser::Str;
+/// use parser_combinator::models::parser_traits::Parse;
+///
+/// let str_parser = Str::new("Test".to_owned());
+/// let mut many = ManyOne::new(Box::new(str_parser));
+/// let result = many.run("TestTestTest");
+/// assert!(result.result.is_some());
+/// assert_eq!(result.result.unwrap().unwrap().unwrap_many().len(), 3);
+/// assert_eq!(result.index, 12);
+/// ```
 pub struct ManyOne<R1, R2, T> {
     parser: Box<dyn Parse<R1, R2, T>>,
 }
