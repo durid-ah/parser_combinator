@@ -81,4 +81,14 @@ mod tests {
         assert_eq!(result.result.unwrap().unwrap().unwrap_many().len(), 1);
         assert_eq!(result.index, 4);
     }
+
+    #[test]
+    fn many_one_parser_zero_fail() {
+        let str_parser = Str::new("Test".to_owned());
+        let mut many_one = ManyOne::new(Box::new(str_parser));
+        let result = many_one.run("StuffTest");
+        assert!(result.result.is_some());
+        assert!(result.result.unwrap().is_err());
+        assert_eq!(result.index, 0);
+    }
 }
