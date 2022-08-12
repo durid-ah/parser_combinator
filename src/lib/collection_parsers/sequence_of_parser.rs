@@ -84,4 +84,3 @@ impl<R1,R2,T> Parse<R1,R2,T> for SequenceOf<R1,R2,T> {
 
    }
 }
-

@@ -1,7 +1,13 @@
 
+
+/// # Cardinality
+/// `Cardinality` represents either ([`Cardinality::One`]) or ([`Cardinality::Many`])
+/// values of the type `R`
 #[derive(Debug, Clone)]
 pub enum Cardinality<R> {
+   // Represents a single value of type `R`
    One(R),
+   // Represents multiple values of type `R`
    Many(Vec<R>)
 }
 

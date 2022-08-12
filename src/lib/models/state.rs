@@ -3,6 +3,8 @@ use super::cardinality::Cardinality;
 
 pub type  ParserResult<R> = Option<Result<Cardinality<R>, String>>;
 
+/// # State
+/// Represents the state returned from the parser 
 #[derive(Clone)]
 pub struct State<R, T> {
    pub index: usize,
