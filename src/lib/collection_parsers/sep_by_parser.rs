@@ -42,10 +42,7 @@ impl<R1,R2,T> Parse<R1,R2,T> for SepBy<R1,R2,T> {
          match thing_we_want_state.result.unwrap() {
             Ok(One(res)) => results.push(res),
             Ok(Many(mut res)) => results.append(&mut res),
-            Err(_) => {
-
-               break;
-            }
+            Err(_) => break
          }
 
          let separator_state = self.separator.transform(final_state);

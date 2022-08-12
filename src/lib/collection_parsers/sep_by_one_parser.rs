@@ -42,10 +42,7 @@ impl<R1,R2,T> Parse<R1,R2,T> for SepByOne<R1,R2,T> {
          match thing_we_want_state.result.unwrap() {
             Ok(One(res)) => results.push(res),
             Ok(Many(mut res)) => results.append(&mut res),
-            Err(_) => {
-
-               break;
-            }
+            Err(_) => break
          }
 
          let separator_state = self.separator.transform(final_state);
@@ -58,6 +55,11 @@ impl<R1,R2,T> Parse<R1,R2,T> for SepByOne<R1,R2,T> {
          if separator_state.result.unwrap().is_err() {
             break;
          }
+      }
+
+      if results.len() == 0 {
+         return final_state
+            .new_err("manyOne: Unable to match any input using parser @ index".to_owned());
       }
 
       return State {
@@ -98,14 +100,14 @@ mod tests {
    }
 
    #[test]
-   fn empty_success() {
+   fn empty_fail() {
       let comma = Str::new(",".to_owned());
       let test_string = Str::new("Test".to_owned());
       let mut sep_parser = SepByOne::new(Box::new(comma), Box::new(test_string));
       let result = sep_parser.run("");
 
       assert!(result.result.is_some());
-      assert_eq!(result.result.unwrap().unwrap().unwrap_many().len(), 0);
+      assert!(result.result.unwrap().is_err());
       assert_eq!(result.index, 0);
    }
 }
