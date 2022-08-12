@@ -21,10 +21,7 @@ impl Str {
 impl Parse<String,String,&str> for Str {
 
    fn transform<'s>(&mut self, state: StringState<'s>) -> StringState<'s> {
-      let contains_error = state.result
-         .as_ref()
-         .and_then(|r| Some(r.is_err()))
-         .unwrap_or(false);
+      let contains_error = state.is_error();
          
       if contains_error {
          return state;
