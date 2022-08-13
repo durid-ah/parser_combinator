@@ -3,6 +3,7 @@ use regex::Regex;
 use crate::models::{parser_traits::Parse, state::State};
 use crate::models::cardinality::Cardinality::One;
 
+#[derive(Clone)]
 pub struct Digits {
    regex_matcher: Regex
 }
@@ -13,11 +14,13 @@ impl Digits {
    }
 }
 
+impl Default for Digits {
+   fn default() -> Self { Self::new() }
+}
+
 impl Parse<String,String,String> for Digits {
    fn transform(&mut self, state: State<String, String>) -> State<String, String> {
-      let contains_error = state.result
-         .as_ref().map(|r| r.is_err())
-         .unwrap_or(false);
+      let contains_error = state.is_error();
 
       if contains_error {
          return state;
