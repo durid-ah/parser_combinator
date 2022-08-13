@@ -29,7 +29,7 @@ impl Parse<String,String,&str> for Str {
 
       let start_index = state.index;
       let sliced_target = &state.target[start_index..];
-      if sliced_target.len() == 0 {
+      if sliced_target.is_empty() {
          return state.new_err(String::from("Str: Unexpected end of input"))
       }
 

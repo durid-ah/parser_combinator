@@ -80,7 +80,7 @@ impl<R1,R2,T> Parse<R1,R2,T> for SequenceOf<R1,R2,T> {
          }
       }
 
-      return State { index: state.index, target, result: Some(Ok(Many(results))) }
+      State { index: state.index, target, result: Some(Ok(Many(results))) }
 
    }
 }

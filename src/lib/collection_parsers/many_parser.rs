@@ -65,11 +65,11 @@ impl<R1, R2, T> Parse<R1, R2, T> for Many<R1, R2, T> {
             }
         }
 
-        return State {
+        State {
             index: final_state.index,
             target,
             result: Some(Ok(Cardinality::Many(results))),
-        };
+        }
     }
 }
 

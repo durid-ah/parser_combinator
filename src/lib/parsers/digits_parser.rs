@@ -16,8 +16,7 @@ impl Digits {
 impl Parse<String,String,String> for Digits {
    fn transform(&mut self, state: State<String, String>) -> State<String, String> {
       let contains_error = state.result
-         .as_ref()
-         .and_then(|r| Some(r.is_err()))
+         .as_ref().map(|r| r.is_err())
          .unwrap_or(false);
 
       if contains_error {

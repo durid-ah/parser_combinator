@@ -43,8 +43,7 @@ impl<R, T> State<R, T> {
    /// the result is `Ok()` or `None`
    pub fn is_error(&self) -> bool {
       self.result
-         .as_ref()
-         .and_then(|r| Some(r.is_err()))
+         .as_ref().map(|r| r.is_err())
          .unwrap_or(false)
    }
 }

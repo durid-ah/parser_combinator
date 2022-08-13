@@ -64,10 +64,10 @@ mod tests {
                   result: Some(Ok(Cardinality::One(String::from("cat"))))}
             }
 
-            return State{ 
+            State{ 
                index: state.index, 
                target: state.target, 
-               result: Some(Err(String::from("Unable to match string 'cat'")))};
+               result: Some(Err(String::from("Unable to match string 'cat'")))}
          }));
    }
 
@@ -83,10 +83,10 @@ mod tests {
                result: Some(Ok(Cardinality::One(String::from("cat"))))}
          }
        
-         return State{ 
+         State{ 
             index: state.index, 
             target: state.target, 
-            result: Some(Err(String::from("Unable to match string 'cat'")))};
+            result: Some(Err(String::from("Unable to match string 'cat'")))}
       }));
    }
 }

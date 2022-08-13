@@ -66,16 +66,16 @@ impl<R1, R2, T> Parse<R1, R2, T> for ManyOne<R1, R2, T> {
             }
         }
 
-        if results.len() == 0 {
+        if results.is_empty() {
             return final_state
                 .new_err("manyOne: Unable to match any input using parser @ index".to_owned());
         }
 
-        return State {
+        State {
             index: final_state.index,
             target,
             result: Some(Ok(Cardinality::Many(results))),
-        };
+        }
     }
 }
 

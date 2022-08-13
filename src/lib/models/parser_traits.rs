@@ -6,7 +6,7 @@ pub trait Parse<R1,R2,T> {
    fn transform(&mut self, state: State<R1, T>) -> State<R2, T>;
    fn run(&mut self, target: T) -> State<R2, T> {
       let initial_state = State{target: Rc::new(target), index: 0, result: None };
-      return self.transform(initial_state);
+      self.transform(initial_state)
    }
 }
 
