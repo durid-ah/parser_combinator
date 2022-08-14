@@ -19,7 +19,7 @@ impl Default for Digits {
 }
 
 impl Parse<String,String,String> for Digits {
-   fn transform(&mut self, state: State<String, String>) -> State<String, String> {
+   fn transform(&self, state: State<String, String>) -> State<String, String> {
       let contains_error = state.is_error();
 
       if contains_error {
@@ -47,7 +47,7 @@ impl Parse<String,String,String> for Digits {
       let match_val = match_result.unwrap();
       return State {
          index: state.index + match_val.end(), 
-         target: state.target.clone(), // TODO: Work on clone 
+         target: state.target.clone(),
          result: Some(Ok(One(match_val.as_str().to_owned()))) 
       }
    }
@@ -60,7 +60,7 @@ mod tests {
 
    #[test]
    fn digit_success_run() {
-      let mut p = Digits::new();
+      let p = Digits::new();
       let res = p.run("123s".to_owned());
       assert!(res.result.unwrap().unwrap().unwrap_one() == "123");
       assert!(res.index == 3);
@@ -68,7 +68,7 @@ mod tests {
 
    #[test]
    fn digit_fail_run() {
-      let mut p = Digits::new();
+      let p = Digits::new();
       let res = p.run("s123s".to_owned());
       assert!(res.result.unwrap().is_err());
       assert!(res.index == 0);

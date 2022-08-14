@@ -19,7 +19,7 @@ impl Default for Letters {
 }
 
 impl Parse<String,String,String> for Letters {
-   fn transform(&mut self, state: State<String, String>) -> State<String, String> {
+   fn transform(&self, state: State<String, String>) -> State<String, String> {
       let contains_error = state.is_error();
 
       if contains_error {
@@ -60,7 +60,7 @@ mod tests {
 
    #[test]
    fn digit_success_run() {
-      let mut p = Letters::new();
+      let p = Letters::new();
       let res = p.run("abcd1s".to_owned());
       assert!(res.result.unwrap().unwrap().unwrap_one() == "abcd");
       assert!(res.index == 4);
@@ -68,7 +68,7 @@ mod tests {
 
    #[test]
    fn digit_fail_run() {
-      let mut p = Letters::new();
+      let p = Letters::new();
       let res = p.run("123s".to_owned());
       assert!(res.result.unwrap().is_err());
       assert!(res.index == 0);

@@ -4,7 +4,7 @@ use crate::models::{state::{ParserResult, State}, parser::Parser, parser_traits:
 /// Maps the result of a parser that implements the [`Parse`] trait and creates a
 /// generic [`Parser`] that will run the previous parser and return a state with 
 /// the mapped result
-pub fn map_result<'a, R1, R2, T, S, F, I>(mut parser: I, map_fn: F) -> Box<dyn Parse< R1, S, T> + 'a>
+pub fn map_result<'a, R1, R2, T, S, F, I>(parser: I, map_fn: F) -> Box<dyn Parse< R1, S, T> + 'a>
    where F: Fn(ParserResult<R2>) -> ParserResult<S> + 'a,
          I: Parse<R1,R2,T> + 'a,
          R1: 'a, R2: 'a, T: 'a, S: 'a {
@@ -23,14 +23,14 @@ pub fn map_result<'a, R1, R2, T, S, F, I>(mut parser: I, map_fn: F) -> Box<dyn P
 /// Chains to parsers to each other through a closure that takes in the result 
 /// of the first parser and returns a struct that implements the [`Parse`] trait.
 /// Returns a new generic [`Parser`] that executes the parsers after each other 
-pub fn chain_parser<'a,I,F,R1,R2,T, S>(mut parser: I, chain_fn: F) -> Box<dyn Parse<R1, S, T> + 'a>
+pub fn chain_parser<'a,I,F,R1,R2,T, S>(parser: I, chain_fn: F) -> Box<dyn Parse<R1, S, T> + 'a>
    where F: Fn(& ParserResult<R2>) -> Box<dyn Parse<R2, S, T> + 'a> + 'a,
          I: Parse<R1,R2,T> + 'a,
          R1: 'a, R2: 'a, T: 'a, S: 'a {
 
    let transformer = move |state: State<R1, T>| {
       let next = parser.transform(state);
-      let mut next_parser = chain_fn(&next.result);
+      let next_parser = chain_fn(&next.result);
 
       next_parser.transform(next)
    };
@@ -49,7 +49,7 @@ mod tests {
       let str_1 = Str::new("Stuff".to_owned());
       let str_2 = Str::new("Stuff".to_owned());
 
-      let mut chained = 
+      let chained = 
          chain_parser(str_1, move |_| Box::new(str_2.clone()));
 
       let res = chained.run("StuffStuff");

@@ -3,7 +3,7 @@ use super::{state::State, parser_traits::Parse};
 /// # Parser: 
 /// a generic parser container that implements the parser trait
 pub struct Parser<'a, R1, R2, T> {
-   pub transformer_fn: Box<dyn FnMut(State<R1,T>) -> State<R2,T> + 'a>,
+   pub transformer_fn: Box<dyn Fn(State<R1,T>) -> State<R2,T> + 'a>,
 }
 
 impl<'a, R1, R2, T> Parser<'a, R1, R2, T> {
@@ -32,7 +32,7 @@ impl<'a, R1, R2, T> Parser<'a, R1, R2, T> {
    ///       result: Some(Err(String::from("Unable to match string 'cat'")))};
    /// }));
    /// ```
-   pub fn new(transformer_fn: Box<dyn FnMut(State<R1,T>) -> State<R2,T> + 'a>) -> Self {
+   pub fn new(transformer_fn: Box<dyn Fn(State<R1,T>) -> State<R2,T> + 'a>) -> Self {
       Self { transformer_fn }
    }
 }
@@ -40,7 +40,7 @@ impl<'a, R1, R2, T> Parser<'a, R1, R2, T> {
 impl<'a, R1, R2, T> Parse<R1, R2, T> for Parser<'a, R1, R2, T> {
    
    /// Run the parsing the logic on a `State` instance
-   fn transform(&mut self, state: State<R1, T>) -> State<R2, T> {
+   fn transform(&self, state: State<R1, T>) -> State<R2, T> {
       (self.transformer_fn)(state)
    }
 }

@@ -29,13 +29,12 @@ impl<'a, R1,R2,T> Between<'a,R1,R2,T>
             })
          });
 
-
          Self { parser }
    }
 }
 
 impl<'a,R1,R2,T> Parse<R1,R2,T> for Between<'a,R1,R2,T>  {
-   fn transform(&mut self, state: State<R1, T>) -> State<R2, T> {
+   fn transform(&self, state: State<R1, T>) -> State<R2, T> {
       self.parser.transform(state)
    }
 }
@@ -51,7 +50,7 @@ mod tests {
       let value = Box::new(Str::new("test".to_owned()));
       let right = Box::new(Str::new(")".to_owned()));
 
-      let mut bet = Between::new(left, right, value);
+      let bet = Between::new(left, right, value);
       let result = bet.run("(test)");
 
       assert_eq!(result.result.unwrap().unwrap().unwrap_many().len(), 1);
@@ -64,7 +63,7 @@ mod tests {
       let value = Box::new(Str::new("test".to_owned()));
       let right = Box::new(Str::new(")".to_owned()));
 
-      let mut bet = Between::new(left, right, value);
+      let bet = Between::new(left, right, value);
       let result = bet.run("(Test)");
 
       assert!(result.result.unwrap().is_err());

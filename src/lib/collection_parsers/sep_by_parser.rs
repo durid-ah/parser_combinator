@@ -47,7 +47,7 @@ impl<R1,R2,T> SepBy<R1,R2,T> {
 }
 
 impl<R1,R2,T> Parse<R1,R2,T> for SepBy<R1,R2,T> {
-   fn transform(&mut self, state: State<R1, T>) -> State<R2, T> {
+   fn transform(&self, state: State<R1, T>) -> State<R2, T> {
       let contains_error = state.is_error();
       if contains_error {
          return State::from_err_state(state);
@@ -104,7 +104,7 @@ mod tests {
    fn success() {
       let comma = Str::new(",".to_owned());
       let test_string = Str::new("Test".to_owned());
-      let mut sep_parser = SepBy::new(Box::new(comma), Box::new(test_string));
+      let sep_parser = SepBy::new(Box::new(comma), Box::new(test_string));
       let result = sep_parser.run("Test,Test,Test");
 
       assert!(result.result.is_some());
@@ -116,7 +116,7 @@ mod tests {
    fn ends_with_separator_success() {
       let comma = Str::new(",".to_owned());
       let test_string = Str::new("Test".to_owned());
-      let mut sep_parser = SepBy::new(Box::new(comma), Box::new(test_string));
+      let sep_parser = SepBy::new(Box::new(comma), Box::new(test_string));
       let result = sep_parser.run("Test,Test,");
 
       assert!(result.result.is_some());
@@ -128,7 +128,7 @@ mod tests {
    fn empty_success() {
       let comma = Str::new(",".to_owned());
       let test_string = Str::new("Test".to_owned());
-      let mut sep_parser = SepBy::new(Box::new(comma), Box::new(test_string));
+      let sep_parser = SepBy::new(Box::new(comma), Box::new(test_string));
       let result = sep_parser.run("");
 
       assert!(result.result.is_some());

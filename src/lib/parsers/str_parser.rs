@@ -20,7 +20,7 @@ impl Str {
 
 impl Parse<String,String,&str> for Str {
 
-   fn transform<'s>(&mut self, state: StringState<'s>) -> StringState<'s> {
+   fn transform<'s>(&self, state: StringState<'s>) -> StringState<'s> {
       let contains_error = state.is_error();
          
       if contains_error {
@@ -56,7 +56,7 @@ mod tests {
 
    #[test]
    fn str_success_exact_parse() {
-      let mut parser = Str::new("Test".to_owned());
+      let parser = Str::new("Test".to_owned());
       let res = parser.run("Test");
       assert!(res.result.unwrap().is_ok());
       assert_eq!(res.index, 4);
@@ -64,7 +64,7 @@ mod tests {
 
    #[test]
    fn str_success_partial_parse() {
-      let mut parser = Str::new("Test".to_owned());
+      let parser = Str::new("Test".to_owned());
       let res = parser.run("Tester");
       assert!(res.result.unwrap().is_ok());
       assert_eq!(res.index, 4);
@@ -72,7 +72,7 @@ mod tests {
 
    #[test]
    fn str_fail_no_match_parse() {
-      let mut parser = Str::new("Test".to_owned());
+      let parser = Str::new("Test".to_owned());
       let res = parser.run("Abcde");
       assert!(res.result.unwrap().is_err());
       assert_eq!(res.index, 0);
@@ -80,7 +80,7 @@ mod tests {
 
    #[test]
    fn str_fail_short_target_parse() {
-      let mut parser = Str::new("Test".to_owned());
+      let parser = Str::new("Test".to_owned());
       let res = parser.run("T");
       assert!(res.result.unwrap().is_err());
    }

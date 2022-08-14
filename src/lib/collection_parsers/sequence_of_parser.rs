@@ -41,7 +41,7 @@ impl<R1,R2,T> SequenceOf<R1,R2,T> {
 }
 
 impl<R1,R2,T> Parse<R1,R2,T> for SequenceOf<R1,R2,T> {
-   fn transform(&mut self, state: State<R1, T>) -> State<R2, T> {
+   fn transform(&self, state: State<R1, T>) -> State<R2, T> {
       let contains_error = state.is_error();
 
       if contains_error {
@@ -58,7 +58,7 @@ impl<R1,R2,T> Parse<R1,R2,T> for SequenceOf<R1,R2,T> {
 
       let target = Rc::clone(&state.target);
 
-      for parser in &mut self.parsers {
+      for parser in &self.parsers {
          let state = parser.transform(final_state);
 
          match state.result.unwrap() {
@@ -94,7 +94,7 @@ mod tests {
    fn test_success() {
       let s1 = Box::new(Str::new("Test1".to_owned()));
       let s2 = Box::new(Str::new("Test2".to_owned()));
-      let mut seq = SequenceOf::new(vec![s1,s2]);
+      let seq = SequenceOf::new(vec![s1,s2]);
       let result = seq.run("Test1Test2");
 
       assert!(result.result.is_some());
@@ -106,7 +106,7 @@ mod tests {
    fn test_fail() {
       let s1 = Box::new(Str::new("Test1".to_owned()));
       let s2 = Box::new(Str::new("Test2".to_owned()));
-      let mut seq = SequenceOf::new(vec![s1,s2]);
+      let seq = SequenceOf::new(vec![s1,s2]);
       let result = seq.run("Test1Test3");
 
       assert!(result.result.is_some());

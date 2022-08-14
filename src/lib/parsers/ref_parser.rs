@@ -1,5 +1,4 @@
 use std::{rc::Rc, cell::RefCell};
-
 use crate::models::{parser_traits::Parse, state::State};
 
 
@@ -16,11 +15,11 @@ impl<R1,R2,T> RefParser<R1,R2,T> {
 }
 
 impl<R1,R2,T> Parse<R1,R2,T> for RefParser<R1,R2,T> {
-   fn transform(&mut self, state: State<R1, T>) -> State<R2, T> {
+   fn transform(&self, state: State<R1, T>) -> State<R2, T> {
       self.reference.borrow_mut().transform(state)
    }
 
-   fn run(&mut self, target: T) -> State<R2, T> {
+   fn run(&self, target: T) -> State<R2, T> {
       self.reference.borrow_mut().run(target)
    }
 }
