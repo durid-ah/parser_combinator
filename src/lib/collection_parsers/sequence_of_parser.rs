@@ -84,3 +84,33 @@ impl<R1,R2,T> Parse<R1,R2,T> for SequenceOf<R1,R2,T> {
 
    }
 }
+
+#[cfg(test)]
+mod tests {
+   use crate::parsers::str_parser::Str;
+   use super::*;
+
+   #[test]
+   fn test_success() {
+      let s1 = Box::new(Str::new("Test1".to_owned()));
+      let s2 = Box::new(Str::new("Test2".to_owned()));
+      let mut seq = SequenceOf::new(vec![s1,s2]);
+      let result = seq.run("Test1Test2");
+
+      assert!(result.result.is_some());
+      assert_eq!(result.result.unwrap().unwrap().unwrap_many().len(), 2);
+      assert_eq!(result.index, 10);
+   }
+
+   #[test]
+   fn test_fail() {
+      let s1 = Box::new(Str::new("Test1".to_owned()));
+      let s2 = Box::new(Str::new("Test2".to_owned()));
+      let mut seq = SequenceOf::new(vec![s1,s2]);
+      let result = seq.run("Test1Test3");
+
+      assert!(result.result.is_some());
+      assert!(result.result.unwrap().is_err());
+      assert_eq!(result.index, 5);
+   }
+}
