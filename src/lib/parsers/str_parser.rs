@@ -4,7 +4,7 @@ use crate::models::parser_traits::Parse;
 use crate::models::state::State;
 use crate::models::cardinality::Cardinality;
 
-type StringState<'state> = State<String, &'state str>;
+pub type StringState<'state> = State<String, &'state str>;
 
 #[derive(Clone)]
 pub struct  Str {

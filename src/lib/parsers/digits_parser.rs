@@ -3,6 +3,8 @@ use regex::Regex;
 use crate::models::{parser_traits::Parse, state::State};
 use crate::models::cardinality::Cardinality::One;
 
+use super::str_parser::StringState;
+
 #[derive(Clone)]
 pub struct Digits {
    regex_matcher: Regex
@@ -18,8 +20,8 @@ impl Default for Digits {
    fn default() -> Self { Self::new() }
 }
 
-impl Parse<String,String,String> for Digits {
-   fn transform(&self, state: State<String, String>) -> State<String, String> {
+impl Parse<String,String,&str> for Digits {
+   fn transform<'s>(&self, state: StringState<'s>) -> StringState<'s> {
       let contains_error = state.is_error();
 
       if contains_error {
@@ -61,7 +63,7 @@ mod tests {
    #[test]
    fn digit_success_run() {
       let p = Digits::new();
-      let res = p.run("123s".to_owned());
+      let res = p.run("123s");
       assert!(res.result.unwrap().unwrap().unwrap_one() == "123");
       assert!(res.index == 3);
    }
@@ -69,7 +71,7 @@ mod tests {
    #[test]
    fn digit_fail_run() {
       let p = Digits::new();
-      let res = p.run("s123s".to_owned());
+      let res = p.run("s123s");
       assert!(res.result.unwrap().is_err());
       assert!(res.index == 0);
    }
