@@ -10,6 +10,10 @@ impl<R1,R2,T> Choice<R1,R2,T> {
    pub fn new(parsers: Vec<Box<dyn Parse<R1,R2,T>>>) -> Self {
       Self { parsers }
    }
+
+   pub fn push_parser(&mut self, parser: Box<dyn Parse<R1,R2,T>>) {
+      self.parsers.push(parser);
+   }
 }
 
 impl<R1,R2,T> Parse<R1,R2,T> for Choice<R1,R2,T> {
@@ -29,7 +33,7 @@ impl<R1,R2,T> Parse<R1,R2,T> for Choice<R1,R2,T> {
       for parser in &self.parsers {
          let next = parser.transform(final_state);
 
-         match state.result.as_ref().unwrap() {
+         match next.result.as_ref().unwrap() {
             Ok(_) => return next,
             _ => {
                final_state = State {

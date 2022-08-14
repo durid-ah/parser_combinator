@@ -38,6 +38,10 @@ impl<R1,R2,T> SequenceOf<R1,R2,T> {
 
       Self { parsers }
    }
+
+   pub fn push_parser(&mut self, parser: Box<dyn Parse<R1,R2,T>>) {
+      self.parsers.push(parser);
+   }
 }
 
 impl<R1,R2,T> Parse<R1,R2,T> for SequenceOf<R1,R2,T> {
