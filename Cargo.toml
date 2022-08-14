@@ -9,6 +9,14 @@ edition = "2021"
 name = "parser_combinator"
 path = "src/lib/lib.rs"
 
+[[bin]]
+name = "parser_combinator"
+path = "src/bin/main.rs"
+
+[[example]]
+name="lisp"
+path = "src/examples/lisp.rs"
+
 [dependencies]
 regex = "1.6.0"
 lazy_static = "1.4.0"
