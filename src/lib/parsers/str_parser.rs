@@ -6,7 +6,7 @@ use crate::models::cardinality::Cardinality;
 
 pub type StringState<'state> = State<String, &'state str>;
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct  Str {
    pub to_match: String
 }
@@ -21,6 +21,8 @@ impl Str {
 impl Parse<String,String,&str> for Str {
 
    fn transform<'s>(&self, state: StringState<'s>) -> StringState<'s> {
+      println!("{:?}", self);
+      
       let contains_error = state.is_error();
          
       if contains_error {

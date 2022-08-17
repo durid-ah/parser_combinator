@@ -18,7 +18,7 @@ impl<'a, R1,R2,T> Between<'a,R1,R2,T>
          let parser =  SequenceOf::new(vec![left, value, right]);
          let parser = map_result::<'a>(parser, |opt: ParserResult<R2>| {
             opt.map(move |res| {
-               res.map(move|card| { 
+               res.map(move|card| {
                   let mut res_vec = card.unwrap_many();
                   let result: Vec<R2> = res_vec
                      .drain(1..res_vec.len() - 1)
