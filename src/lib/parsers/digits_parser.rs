@@ -53,7 +53,7 @@ impl Parse<String,String,&str> for Digits {
          return state;
       }
 
-      let match_result = self.regex_matcher.find_at(&state.target, state.index);
+      let match_result = self.regex_matcher.find(&state.target[state.index..]);
 
       if match_result.is_none() {
          let state = State {
@@ -84,6 +84,8 @@ impl Parse<String,String,&str> for Digits {
 
 #[cfg(test)]
 mod tests {
+    use regex::Regex;
+
     use crate::models::parser_traits::Parse;
     use super::Digits;
 
@@ -101,5 +103,14 @@ mod tests {
       let res = p.run("s123s");
       assert!(res.result.unwrap().is_err());
       assert!(res.index == 0);
+   }
+
+   #[test]
+   fn feature() {
+      // let regex_matcher = Regex::new(r"^[0-9]+").unwrap();
+      // let res = regex_matcher.find(&"(+ 1 "[3..]);
+      // let r1 = res.is_some();
+      // let r3 = res.unwrap();
+      // println!();
    }
 }
