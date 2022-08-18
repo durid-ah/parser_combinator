@@ -148,7 +148,55 @@ pub fn main() {
       Box::new(operation_sequence));
 
    expr.borrow_mut().push_parser(Box::new(operation));
-   let _ = expr.borrow().run("(+ 1 2 (- 1 4))");
+   let res = expr.borrow().run("(+ 1 2 (/ 5 2) (* 2 5) (- 1 5))");
 
-   println!("Stuff")
+   if let Some(Ok(Cardinality::Many(vals))) = res.result {
+
+      let result = eval(&Token::Statement(vals));
+      println!("RESULT: {}", result);
+   }
+}
+
+fn eval(root_token: &Token) -> f64 {
+   let mut total = 0_f64;
+
+   if let Token::Number(val) = root_token {
+      return *val
+   } else if let Token::Statement(vals) = root_token {
+
+      let op = &vals[0];
+      let rest = &vals[1..];
+      if let Token::Op(operation) = op {
+         use Operation::*;
+   
+         match operation {
+            Add => {
+               total = rest.into_iter()
+                  .fold(0_f64, |prev, curr| prev + eval(curr));
+            },
+            Minus => {
+               total = rest
+                  .into_iter()
+                  .rev()
+                  .fold(0_f64, |prev, curr| eval(curr) - prev);
+            },
+            Multiply => {
+               total = rest
+                  .into_iter()
+                  .fold(1_f64, |prev, curr| eval(curr) * prev);
+            },
+            Divide => {
+               total = rest
+                  .into_iter()
+                  .rev()
+                  .fold(1_f64, |prev, curr| eval(curr) / prev);
+            }   
+         }
+   
+      }
+   }
+
+
+
+   total
 }
