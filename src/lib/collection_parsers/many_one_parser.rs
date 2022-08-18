@@ -1,6 +1,8 @@
 use crate::models::cardinality::Cardinality;
 use crate::models::parser_traits::Parse;
 use crate::models::state::State;
+use crate::utility::local_log;
+use std::fmt;
 use std::rc::Rc;
 
 /// # ManyOne:
@@ -29,6 +31,7 @@ use std::rc::Rc;
 /// assert_eq!(result.result.unwrap().unwrap().unwrap_many().len(), 3);
 /// assert_eq!(result.index, 12);
 /// ```
+#[derive(Debug)]
 pub struct ManyOne<R1, R2, T> {
     parser: Box<dyn Parse<R1, R2, T>>,
 }
@@ -39,44 +42,60 @@ impl<R1, R2, T> ManyOne<R1, R2, T> {
     }
 }
 
-impl<R1, R2, T> Parse<R1, R2, T> for ManyOne<R1, R2, T> {
-    fn transform(&self, state: State<R1, T>) -> State<R2, T> {
-        let mut results: Vec<R2> = Vec::new();
-        let target = Rc::clone(&state.target);
-        let mut final_state: State<R1, T> = State {
+impl<R1, R2, T> Parse<R1, R2, T> for ManyOne<R1, R2, T> 
+   where R1: fmt::Debug, R2: fmt::Debug, T: fmt::Debug {
+    
+   fn transform(&self, state: State<R1, T>) -> State<R2, T> {
+      local_log::log(format!("{}", "ManyOne"));
+      local_log::start_scope();
+      local_log::log(format!("{:?}", state));
+
+      let mut results: Vec<R2> = Vec::new();
+      let target = Rc::clone(&state.target);
+      let mut final_state: State<R1, T> = State {
+         index: state.index,
+         target: Rc::clone(&state.target),
+         result: state.result,
+      };
+
+      let mut done = false;
+      while !done {
+         let state = self.parser.transform(final_state);
+
+         match state.result.unwrap() {
+             Ok(Cardinality::One(res)) => results.push(res),
+             Ok(Cardinality::Many(mut res)) => results.append(&mut res),
+             Err(_) => done = true,
+         }
+
+         final_state = State {
             index: state.index,
-            target: Rc::clone(&state.target),
-            result: state.result,
-        };
+            target: Rc::clone(&target),
+            result: None,
+         }
+      }
 
-        let mut done = false;
-        while !done {
-            let state = self.parser.transform(final_state);
+      if results.is_empty() {
+         let err_state = final_state
+            .new_err("ManyOne: Unable to match any input using parser @ index".to_owned());
 
-            match state.result.unwrap() {
-                Ok(Cardinality::One(res)) => results.push(res),
-                Ok(Cardinality::Many(mut res)) => results.append(&mut res),
-                Err(_) => done = true,
-            }
+         local_log::log(format!("{:?}", err_state));
+         local_log::end_scope();
 
-            final_state = State {
-                index: state.index,
-                target: Rc::clone(&target),
-                result: None,
-            }
-        }
+         return err_state;
+      }
 
-        if results.is_empty() {
-            return final_state
-                .new_err("manyOne: Unable to match any input using parser @ index".to_owned());
-        }
+      let res = State {
+         index: final_state.index,
+         target,
+         result: Some(Ok(Cardinality::Many(results))),
+      };
 
-        State {
-            index: final_state.index,
-            target,
-            result: Some(Ok(Cardinality::Many(results))),
-        }
-    }
+      local_log::log(format!("{:?}", res));
+      local_log::end_scope();
+
+      res
+   }
 }
 
 #[cfg(test)]

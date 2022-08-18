@@ -1,4 +1,4 @@
-use std::rc::Rc;
+use std::{rc::Rc, fmt::Debug};
 use super::cardinality::Cardinality;
 
 pub type  ParserResult<R> = Option<Result<Cardinality<R>, String>>;
@@ -12,7 +12,7 @@ pub struct State<R, T> {
    pub result: ParserResult<R>
 }
 
-impl<R, T> State<R, T> {
+impl<R: Debug, T: Debug> State<R, T> {
 
    pub fn new_err<R2>(self, err: String) -> State<R2, T> {
       State {
@@ -45,5 +45,14 @@ impl<R, T> State<R, T> {
       self.result
          .as_ref().map(|r| r.is_err())
          .unwrap_or(false)
+   }
+}
+
+impl<R: Debug, T: Debug> Debug for State<R, T> {
+   fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+      f.debug_struct("State")
+         .field("index", &self.index)
+         .field("target", &self.target)
+         .field("result", &self.result).finish()
    }
 }

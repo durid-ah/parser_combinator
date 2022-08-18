@@ -1,3 +1,4 @@
+use std::fmt;
 use std::rc::Rc;
 
 use crate::models::cardinality::Cardinality::{One, Many};
@@ -28,6 +29,7 @@ use crate::models::state::State;
 /// assert_eq!(result.result.unwrap().unwrap().unwrap_many().len(), 3);
 /// assert_eq!(result.index, 14);
 /// ```
+#[derive(Debug)]
 pub struct SepByOne<R1,R2,T>{
    separator: Box<dyn Parse<R1, R2, T>>,
    separated: Box<dyn Parse<R1,R2,T>>
@@ -39,8 +41,12 @@ impl<R1,R2,T> SepByOne<R1,R2,T> {
    } 
 }
 
-impl<R1,R2,T> Parse<R1,R2,T> for SepByOne<R1,R2,T> {
+impl<R1,R2,T> Parse<R1,R2,T> for SepByOne<R1,R2,T> 
+   where R1: fmt::Debug, R2: fmt::Debug, T: fmt::Debug {
+      
    fn transform(&self, state: State<R1, T>) -> State<R2, T> {
+      println!("{:?}", self);
+      
       let contains_error = state.is_error();
       if contains_error {
          return State::from_err_state(state);

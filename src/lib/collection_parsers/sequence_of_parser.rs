@@ -1,6 +1,8 @@
+use std::fmt::{Debug, self};
 use std::rc::Rc;
 use crate::models::{parser_traits::Parse, state::State};
 use crate::models::cardinality::Cardinality::{One, Many};
+use crate::utility::local_log;
 
 
 /// # SequenceOf:
@@ -26,11 +28,14 @@ use crate::models::cardinality::Cardinality::{One, Many};
 /// 
 /// assert!(result.result.is_some());
 /// ```
+#[derive(Debug) ]
 pub struct SequenceOf<R1,R2,T> {
    parsers: Vec<Box<dyn Parse<R1,R2,T>>>
 }
 
-impl<R1,R2,T> SequenceOf<R1,R2,T> {
+impl<R1,R2,T> SequenceOf<R1,R2,T> 
+   where R1: fmt::Debug, R2: fmt::Debug, T: fmt::Debug {
+
    pub fn new(parsers: Vec<Box<dyn Parse<R1,R2,T>>>) -> Self {
       if parsers.is_empty() {
          panic!("SequenceOf: parsers must not be empty")
@@ -44,11 +49,19 @@ impl<R1,R2,T> SequenceOf<R1,R2,T> {
    }
 }
 
-impl<R1,R2,T> Parse<R1,R2,T> for SequenceOf<R1,R2,T> {
+impl<R1,R2,T> Parse<R1,R2,T> for SequenceOf<R1,R2,T> 
+   where R1: Debug, R2: Debug, T:Debug {
+      
    fn transform(&self, state: State<R1, T>) -> State<R2, T> {
       let contains_error = state.is_error();
+      local_log::log(format!("{}", "SequenceOf"));
+      local_log::start_scope();
+      local_log::log(format!("{:?}", state));
 
       if contains_error {
+         local_log::log(format!("{:?}", state));
+         local_log::end_scope();
+         
          return State::from_err_state(state)
       }
 
@@ -69,11 +82,16 @@ impl<R1,R2,T> Parse<R1,R2,T> for SequenceOf<R1,R2,T> {
             Ok(One(res)) => results.push(res),
             Ok(Many(mut res)) => results.append(&mut res),
             Err(err) => {
-               return State {
+               let err_state = State {
                   index: state.index,
                   target: state.target,
                   result: Some(Err(err))
-               }
+               };
+
+               local_log::log(format!("{:?}", err_state));
+               local_log::end_scope();
+
+               return err_state;
             }
          }
 
@@ -84,8 +102,17 @@ impl<R1,R2,T> Parse<R1,R2,T> for SequenceOf<R1,R2,T> {
          }
       }
 
-      State { index: final_state.index, target, result: Some(Ok(Many(results))) }
 
+      let res = State { 
+         index: final_state.index, 
+         target, 
+         result: Some(Ok(Many(results))) 
+      };
+
+      local_log::log(format!("{:?}", res));
+      local_log::end_scope();
+      
+      res
    }
 }
 

@@ -1,3 +1,5 @@
+use std::fmt;
+
 use regex::Regex;
 
 use crate::models::{parser_traits::Parse, state::State};
@@ -18,8 +20,17 @@ impl Default for Letters {
    fn default() -> Self { Self::new() }
 }
 
+impl fmt::Debug for Letters {
+   fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+      f.debug_struct("Letters").finish()
+   }
+}
+
 impl Parse<String,String,String> for Letters {
    fn transform(&self, state: State<String, String>) -> State<String, String> {
+      println!("{:?}", self);
+      println!("\t{:?}", state);
+      println!("");
       let contains_error = state.is_error();
 
       if contains_error {

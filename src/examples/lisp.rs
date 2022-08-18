@@ -17,9 +17,9 @@ use parser_combinator::{
    }, parser_helpers::map_result
 };
 
-type StrParser<'a> = Parser<'a, String, String, &'a str>;
-type StrSeq<'a> = SequenceOf<String,String,&'a str>;
-type StrChoice<'a> = Choice<String,String,&'a str>;
+// type StrParser<'a> = Parser<'a, String, String, &'a str>;
+// type StrSeq<'a> = SequenceOf<String,String,&'a str>;
+// type StrChoice<'a> = Choice<String,String,&'a str>;
 type Ptr<T> = Rc<RefCell<T>>;
 
 type TokenParser<'a> = Parser<'a, String, Token, &'a str>;
@@ -28,6 +28,7 @@ type TokenSeq<'a> = SequenceOf<String,Token,&'a str>;
 type TokenChoice<'a> = Choice<String,Token,&'a str>;
 type TokenRes = Result<Cardinality<Token>, String>;
 
+#[derive(Debug)]
 enum Operation {
    Add,
    Subtract,
@@ -35,11 +36,12 @@ enum Operation {
    Multiply
 }
 
+#[derive(Debug)]
 enum Token {
    Op(Operation),
    Number(f64),
    String(String),
-   Statement(Vec<Token>)
+   // Statement(Vec<Token>)
 }
 
 fn map_string_parser<'a>(parser: Str) -> Box<dyn Parse<String, Token, &'a str> + 'a> {
@@ -130,7 +132,7 @@ pub fn main() {
       Box::new(operation_sequence));
 
    expr.borrow_mut().push_parser(Box::new(operation));
-   let res = expr.borrow().run("(+ 1 2)");
+   let _ = expr.borrow().run("(+ 1 2)");
 
    println!("Stuff")
 }

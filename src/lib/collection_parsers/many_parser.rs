@@ -1,6 +1,7 @@
 use crate::models::cardinality::Cardinality;
 use crate::models::parser_traits::Parse;
 use crate::models::state::State;
+use std::fmt;
 use std::rc::Rc;
 
 /// # Many:
@@ -28,6 +29,7 @@ use std::rc::Rc;
 /// assert_eq!(result.result.unwrap().unwrap().unwrap_many().len(), 3);
 /// assert_eq!(result.index, 12);
 /// ```
+#[derive(Debug)]
 pub struct Many<R1, R2, T> {
     parser: Box<dyn Parse<R1, R2, T>>,
 }
@@ -38,8 +40,14 @@ impl<R1, R2, T> Many<R1, R2, T> {
     }
 }
 
-impl<R1, R2, T> Parse<R1, R2, T> for Many<R1, R2, T> {
+impl<R1, R2, T> Parse<R1, R2, T> for Many<R1, R2, T> 
+    where R1: fmt::Debug, R2: fmt::Debug, T: fmt::Debug {
+    
     fn transform(&self, state: State<R1, T>) -> State<R2, T> {
+        println!("{:?}", self);
+        println!("\t{:?}", state);
+        println!("");
+
         let mut results: Vec<R2> = Vec::new();
         let target = Rc::clone(&state.target);
         let mut final_state: State<R1, T> = State {

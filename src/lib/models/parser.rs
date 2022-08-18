@@ -1,3 +1,5 @@
+use std::fmt;
+
 use super::{state::State, parser_traits::Parse};
 
 /// # Parser: 
@@ -37,8 +39,13 @@ impl<'a, R1, R2, T> Parser<'a, R1, R2, T> {
    }
 }
 
+impl<'a, R1, R2, T> fmt::Debug for Parser<'a, R1, R2, T> {
+   fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+      f.debug_struct("Custom Parse").finish()
+   }
+}
+
 impl<'a, R1, R2, T> Parse<R1, R2, T> for Parser<'a, R1, R2, T> {
-   
    /// Run the parsing the logic on a `State` instance
    fn transform(&self, state: State<R1, T>) -> State<R2, T> {
       (self.transformer_fn)(state)

@@ -1,8 +1,8 @@
-use std::rc::Rc;
+use std::{rc::Rc, fmt::Debug};
 use super::state::State;
 
 
-pub trait Parse<R1,R2,T> {
+pub trait Parse<R1,R2,T>: Debug {
    fn transform(&self, state: State<R1, T>) -> State<R2, T>;
    fn run(&self, target: T) -> State<R2, T> {
       let initial_state = State{target: Rc::new(target), index: 0, result: None };

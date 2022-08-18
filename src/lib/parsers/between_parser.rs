@@ -1,15 +1,19 @@
+use std::fmt::{Debug, self};
+
 use crate::models::parser_traits::Parse;
 use crate::models::state::{ State, ParserResult };
 use crate::parser_helpers::map_result;
 use crate::models::cardinality::Cardinality;
 use crate::collection_parsers::sequence_of_parser::SequenceOf;
+use crate::utility::local_log;
 
+#[derive(Debug)]
 pub struct Between<'a,R1,R2,T> {
    parser: Box<dyn Parse<R1,R2,T> + 'a>
 }
 
 impl<'a, R1,R2,T> Between<'a,R1,R2,T> 
-   where R2: 'a, R1: 'a, T: 'a {
+   where R2: 'a + Debug, R1: 'a + Debug, T: 'a + Debug {
    pub fn new(
       left: Box<dyn Parse<R1,R2,T>>,
       right: Box<dyn Parse<R1,R2,T>>,
@@ -33,9 +37,21 @@ impl<'a, R1,R2,T> Between<'a,R1,R2,T>
    }
 }
 
-impl<'a,R1,R2,T> Parse<R1,R2,T> for Between<'a,R1,R2,T>  {
+
+impl<'a,R1,R2,T> Parse<R1,R2,T> for Between<'a,R1,R2,T>  
+   where R1: fmt::Debug, R2: fmt::Debug, T: fmt::Debug {
+
    fn transform(&self, state: State<R1, T>) -> State<R2, T> {
-      self.parser.transform(state)
+      local_log::log(format!("{}", "Between"));
+      local_log::start_scope();
+      local_log::log(format!("{:?}", state));
+      
+      let res = self.parser.transform(state);
+      
+      local_log::log(format!("{:?}", res));
+      local_log::end_scope();
+
+      res
    }
 }
 
