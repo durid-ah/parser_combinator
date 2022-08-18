@@ -33,7 +33,6 @@ impl Parse<String,String,&str> for Digits {
    fn transform<'s>(&self, state: StringState<'s>) -> StringState<'s> {
       local_log::log(format!("{:?}", self));
       local_log::start_scope();
-      local_log::log(format!("{:?}", state));
       
       let contains_error = state.is_error();
 
@@ -84,8 +83,6 @@ impl Parse<String,String,&str> for Digits {
 
 #[cfg(test)]
 mod tests {
-    use regex::Regex;
-
     use crate::models::parser_traits::Parse;
     use super::Digits;
 

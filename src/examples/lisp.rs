@@ -17,9 +17,6 @@ use parser_combinator::{
    }, parser_helpers::map_result
 };
 
-// type StrParser<'a> = Parser<'a, String, String, &'a str>;
-// type StrSeq<'a> = SequenceOf<String,String,&'a str>;
-// type StrChoice<'a> = Choice<String,String,&'a str>;
 type Ptr<T> = Rc<RefCell<T>>;
 
 type TokenParser<'a> = Parser<'a, String, Token, &'a str>;
@@ -31,7 +28,7 @@ type TokenRes = Result<Cardinality<Token>, String>;
 #[derive(Debug, Clone, Copy)]
 enum Operation {
    Add,
-   Subtract,
+   Minus,
    Divide,
    Multiply
 }
@@ -41,11 +38,10 @@ enum Token {
    Op(Operation),
    Number(f64),
    String(String),
-   // Statement(Vec<Token>)
+   Statement(Vec<Token>)
 }
 
 fn map_string_parser<'a>(parser: Str) -> Box<dyn Parse<String, Token, &'a str> + 'a> {
-   
    return map_result(parser, |result: ParserResult<String>| {
       let res: TokenRes = match result {
          Some(Ok(One(res))) => Ok(One(Token::String(res))),
@@ -56,37 +52,51 @@ fn map_string_parser<'a>(parser: Str) -> Box<dyn Parse<String, Token, &'a str> +
    });
 }
 
-pub fn main() {
-   // Get the digits and convert it to Token type
-   let digits: Box<dyn Parse<String, Token, &str>> = map_result(Digits::new(), 
+fn map_digit_parser<'a> (digits: Digits) -> Box<dyn Parse<String, Token, &'a str> + 'a> {
+   map_result(digits, 
       |result: ParserResult<String>| {
          let res: TokenRes = match result {
             Some(Ok(One(res))) => 
                Ok(One(Token::Number(res.parse::<f64>().unwrap()))),
+            Some(Err(err)) => Err(err),
             _ => Err("Failed to parse digits".to_owned())
          };
 
          Some(res)
-      });
+      })
+}
+
+pub fn main() {
+   // Get the digits and convert it to Token type
+   let digits: Box<dyn Parse<String, Token, &str>> = map_digit_parser(Digits::new());
 
    let space: TokenParseTrait = map_string_parser(Str::new(" ".to_owned()));
 
+   // Create a parser for each mathematical operation
    let add = Str::new("+".to_owned());
    let subtract = Str::new("-".to_owned());
    let multiply = Str::new("*".to_owned());
    let divide = Str::new("/".to_owned());
 
    let expr: TokenChoice = Choice::new(vec![digits]);
-
    let expr: Ptr<TokenChoice> = Rc::new(RefCell::new(expr));
-
    let expr_2: Ptr<TokenChoice> = Rc::clone(&expr);
    let expr_parser: TokenParser = Parser::new(
       Box::new(
          move |state: State<String, &str>| expr_2.borrow().transform(state)));
 
+   let expr_parser = map_result(
+      expr_parser, 
+      |res: ParserResult<Token>| {
+         match res {
+            Some(Ok(Cardinality::Many(vals))) => Some(Ok(One(Token::Statement(vals)))),
+            val => val
+         }
+      }
+   );
+
    let space_prefix_expr: TokenParseTrait = map_result(
-      SequenceOf::new(vec![space, Box::new(expr_parser)]),
+      SequenceOf::new(vec![space, expr_parser]),
       |res: ParserResult<Token>| {
          match res {
             Some(Ok(Cardinality::Many(res))) => Some(Ok(One(res[1].clone()))),
@@ -106,12 +116,12 @@ pub fn main() {
    let operator: TokenParseTrait = map_result(operator, 
       |result: ParserResult<String>| {
          use Token::Op;
-         use Operation::{Add, Subtract, Multiply, Divide};
+         use Operation::{Add, Minus, Multiply, Divide};
 
          let res: TokenRes = if let Some(Ok(One(res))) = result {
             match res.as_str() {
                "+" => Ok(One(Op(Add))),
-               "-" => Ok(One(Op(Subtract))),
+               "-" => Ok(One(Op(Minus))),
                "*" => Ok(One(Op(Multiply))),
                "/" => Ok(One(Op(Divide))),
                _ => panic!("Invalid Operation")
@@ -138,7 +148,7 @@ pub fn main() {
       Box::new(operation_sequence));
 
    expr.borrow_mut().push_parser(Box::new(operation));
-   let _ = expr.borrow().run("(+ 1 2)");
+   let _ = expr.borrow().run("(+ 1 2 (- 1 4))");
 
    println!("Stuff")
 }

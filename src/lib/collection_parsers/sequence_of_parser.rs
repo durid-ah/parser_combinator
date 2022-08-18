@@ -56,7 +56,6 @@ impl<R1,R2,T> Parse<R1,R2,T> for SequenceOf<R1,R2,T>
       let contains_error = state.is_error();
       local_log::log(format!("{}", "SequenceOf"));
       local_log::start_scope();
-      local_log::log(format!("{:?}", state));
 
       if contains_error {
          local_log::log(format!("{:?}", state));

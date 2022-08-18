@@ -48,7 +48,6 @@ impl<R1, R2, T> Parse<R1, R2, T> for ManyOne<R1, R2, T>
    fn transform(&self, state: State<R1, T>) -> State<R2, T> {
       local_log::log(format!("{}", "ManyOne"));
       local_log::start_scope();
-      local_log::log(format!("{:?}", state));
 
       let mut results: Vec<R2> = Vec::new();
       let target = Rc::clone(&state.target);

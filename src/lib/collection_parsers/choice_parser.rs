@@ -26,7 +26,6 @@ impl<R1,R2,T> Parse<R1,R2,T> for Choice<R1,R2,T>
    fn transform(&self, state: State<R1, T>) -> State<R2, T> {
       local_log::log(format!("{}", "Choice"));
       local_log::start_scope();
-      local_log::log(format!("{:?}", state));
 
       let contains_error = state.is_error();
 
