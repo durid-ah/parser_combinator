@@ -13,7 +13,7 @@ use parser_combinator::{
    models::{
       parser::Parser, 
       parser_traits::Parse, 
-      state::{State, ParserResult}, cardinality::Cardinality
+      state::{State, ParserResult}, cardinality::Cardinality::{self, One}
    }, parser_helpers::map_result
 };
 
@@ -28,7 +28,7 @@ type TokenSeq<'a> = SequenceOf<String,Token,&'a str>;
 type TokenChoice<'a> = Choice<String,Token,&'a str>;
 type TokenRes = Result<Cardinality<Token>, String>;
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy)]
 enum Operation {
    Add,
    Subtract,
@@ -36,7 +36,7 @@ enum Operation {
    Multiply
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 enum Token {
    Op(Operation),
    Number(f64),
@@ -48,8 +48,7 @@ fn map_string_parser<'a>(parser: Str) -> Box<dyn Parse<String, Token, &'a str> +
    
    return map_result(parser, |result: ParserResult<String>| {
       let res: TokenRes = match result {
-         Some(Ok(Cardinality::One(res))) => 
-            Ok(Cardinality::One(Token::String(res))),
+         Some(Ok(One(res))) => Ok(One(Token::String(res))),
          _ => Err("Failed to parse string".to_owned())
       };
    
@@ -58,12 +57,12 @@ fn map_string_parser<'a>(parser: Str) -> Box<dyn Parse<String, Token, &'a str> +
 }
 
 pub fn main() {
+   // Get the digits and convert it to Token type
    let digits: Box<dyn Parse<String, Token, &str>> = map_result(Digits::new(), 
       |result: ParserResult<String>| {
-         let res = match result {
-            Some(Ok(Cardinality::One(res))) => 
-               Ok(Cardinality::One(
-                  Token::Number(res.parse::<f64>().unwrap()))),
+         let res: TokenRes = match result {
+            Some(Ok(One(res))) => 
+               Ok(One(Token::Number(res.parse::<f64>().unwrap()))),
             _ => Err("Failed to parse digits".to_owned())
          };
 
@@ -86,8 +85,16 @@ pub fn main() {
       Box::new(
          move |state: State<String, &str>| expr_2.borrow().transform(state)));
 
-   let space_prefix_expr: Box<TokenSeq> = Box::new(
-      SequenceOf::new(vec![space, Box::new(expr_parser)]));
+   let space_prefix_expr: TokenParseTrait = map_result(
+      SequenceOf::new(vec![space, Box::new(expr_parser)]),
+      |res: ParserResult<Token>| {
+         match res {
+            Some(Ok(Cardinality::Many(res))) => Some(Ok(One(res[1].clone()))),
+            Some(Err(s)) => Some(Err(s)),
+            _ => panic!("Space Prefix Parse Failed") 
+         }
+      }
+   );
 
    let operator = Choice::new(vec![
       Box::new(add),
@@ -98,7 +105,6 @@ pub fn main() {
 
    let operator: TokenParseTrait = map_result(operator, 
       |result: ParserResult<String>| {
-         use Cardinality::One;
          use Token::Op;
          use Operation::{Add, Subtract, Multiply, Divide};
 
@@ -124,7 +130,7 @@ pub fn main() {
       ]);
 
    let left_bracket: TokenParseTrait = map_string_parser(Str::new("(".to_owned()));
-   let right_bracket: TokenParseTrait = map_string_parser(Str::new("(".to_owned()));
+   let right_bracket: TokenParseTrait = map_string_parser(Str::new(")".to_owned()));
 
    let operation = Between::new(
       left_bracket,
