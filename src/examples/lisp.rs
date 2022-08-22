@@ -133,8 +133,7 @@ pub fn main() {
          Some(res)
       });
 
-   let operation_sequence: TokenSeq =
-      SequenceOf::new(vec![
+   let operation_sequence: TokenSeq = SequenceOf::new(vec![
          operator,
          Box::new(ManyOne::new(space_prefix_expr)) // TODO: change to: at_least_two
       ]);
