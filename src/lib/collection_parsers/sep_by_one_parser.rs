@@ -1,4 +1,5 @@
 use std::fmt;
+use std::marker::PhantomData;
 use std::rc::Rc;
 
 use crate::models::cardinality::Cardinality::{One, Many};
@@ -22,7 +23,7 @@ use crate::models::state::State;
 ///
 /// let comma = Str::new(",".to_owned());
 /// let test_string = Str::new("Test".to_owned());
-/// let mut sep_parser = SepByOne::new(Box::new(comma), Box::new(test_string));
+/// let mut sep_parser = SepByOne::new(comma, test_string);
 /// let result = sep_parser.run("Test,Test,Test");
 /// 
 /// assert!(result.result.is_some());
@@ -30,19 +31,29 @@ use crate::models::state::State;
 /// assert_eq!(result.index, 14);
 /// ```
 #[derive(Debug)]
-pub struct SepByOne<R1,R2,T>{
-   separator: Box<dyn Parse<R1, R2, T>>,
-   separated: Box<dyn Parse<R1,R2,T>>
+pub struct SepByOne<R1,R2,T,S,V>
+   where S: Parse<R1, R2, T>,
+      V: Parse<R1, R2, T> {
+   separator: S,
+   separated: V,
+   _p1: PhantomData<R1>,
+   _p2: PhantomData<R2>,
+   _p3: PhantomData<T>,
 }
 
-impl<R1,R2,T> SepByOne<R1,R2,T> {
-   pub fn new(separator: Box<dyn Parse<R1, R2, T>>, separated: Box<dyn Parse<R1,R2,T>>) -> Self {
-      Self { separator, separated }
+impl<R1,R2,T,S,V> SepByOne<R1,R2,T, S, V> 
+   where S: Parse<R1, R2, T>,
+      V: Parse<R1, R2, T> {
+
+   pub fn new(separator: S, separated: V) -> Self {
+      Self { separator, separated, _p1: PhantomData, _p2: PhantomData, _p3: PhantomData }
    } 
 }
 
-impl<R1,R2,T> Parse<R1,R2,T> for SepByOne<R1,R2,T> 
-   where R1: fmt::Debug, R2: fmt::Debug, T: fmt::Debug {
+impl<R1,R2,T,S,V> Parse<R1,R2,T> for SepByOne<R1,R2,T,S,V>
+   where R1: fmt::Debug, R2: fmt::Debug, T: fmt::Debug,
+      S: Parse<R1, R2, T>,
+      V: Parse<R1, R2, T> {
       
    fn transform(&self, state: State<R1, T>) -> State<R2, T> {
       println!("{:?}", self);
@@ -108,7 +119,7 @@ mod tests {
    fn success() {
       let comma = Str::new(",".to_owned());
       let test_string = Str::new("Test".to_owned());
-      let sep_parser = SepByOne::new(Box::new(comma), Box::new(test_string));
+      let sep_parser = SepByOne::new(comma, test_string);
       let result = sep_parser.run("Test,Test,Test");
 
       assert!(result.result.is_some());
@@ -120,7 +131,7 @@ mod tests {
    fn ends_with_separator_success() {
       let comma = Str::new(",".to_owned());
       let test_string = Str::new("Test".to_owned());
-      let sep_parser = SepByOne::new(Box::new(comma), Box::new(test_string));
+      let sep_parser = SepByOne::new(comma, test_string);
       let result = sep_parser.run("Test,Test,");
 
       assert!(result.result.is_some());
@@ -132,7 +143,7 @@ mod tests {
    fn empty_fail() {
       let comma = Str::new(",".to_owned());
       let test_string = Str::new("Test".to_owned());
-      let sep_parser = SepByOne::new(Box::new(comma), Box::new(test_string));
+      let sep_parser = SepByOne::new(comma, test_string);
       let result = sep_parser.run("");
 
       assert!(result.result.is_some());

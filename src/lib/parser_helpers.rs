@@ -4,7 +4,7 @@ use crate::models::{state::{ParserResult, State}, parser::Parser, parser_traits:
 /// Maps the result of a parser that implements the [`Parse`] trait and creates a
 /// generic [`Parser`] that will run the previous parser and return a state with 
 /// the mapped result
-pub fn map_result<'a, R1, R2, T, S, F, I>(parser: I, map_fn: F) -> Box<dyn Parse< R1, S, T> + 'a>
+pub fn map_result<'a, R1, R2, T, S, F, I>(parser: I, map_fn: F) -> Parser<'a, R1, S, T>
    where F: Fn(ParserResult<R2>) -> ParserResult<S> + 'a,
          I: Parse<R1,R2,T> + 'a,
          R1: 'a, R2: 'a, T: 'a, S: 'a {
@@ -16,7 +16,7 @@ pub fn map_result<'a, R1, R2, T, S, F, I>(parser: I, map_fn: F) -> Box<dyn Parse
       State{ index: next.index, target: next.target, result }
    };
 
-   Box::new(Parser::new(Box::new(transformer)))
+   Parser::new(Box::new(transformer))
 }
 
 

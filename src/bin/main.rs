@@ -4,7 +4,7 @@ use parser_combinator::models::parser_traits::Parse;
 
 fn main() {
     let str_parser = Str::new("Test".to_owned());
-    let many = Many::new(Box::new(str_parser));
+    let many = Many::new(str_parser);
     let result = many.run("TestTestTest");
     assert!(result.result.is_some());
     assert_eq!(result.result.unwrap().unwrap().unwrap_many().len(), 3);

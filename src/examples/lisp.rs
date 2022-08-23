@@ -17,10 +17,10 @@ use parser_combinator::{
    }, parser_helpers::map_result
 };
 
+
 type Ptr<T> = Rc<RefCell<T>>;
 
 type TokenParser<'a> = Parser<'a, String, Token, &'a str>;
-type TokenParseTrait<'a> = Box<dyn Parse<String, Token, &'a str>>;
 type TokenSeq<'a> = SequenceOf<String,Token,&'a str>;
 type TokenChoice<'a> = Choice<String,Token,&'a str>;
 type TokenRes = Result<Cardinality<Token>, String>;
@@ -41,7 +41,7 @@ enum Token {
    Statement(Vec<Token>)
 }
 
-fn map_string_parser<'a>(parser: Str) -> Box<dyn Parse<String, Token, &'a str> + 'a> {
+fn map_string_parser<'a>(parser: Str) -> TokenParser<'a> {
    return map_result(parser, |result: ParserResult<String>| {
       let res: TokenRes = match result {
          Some(Ok(One(res))) => Ok(One(Token::String(res))),
@@ -52,7 +52,7 @@ fn map_string_parser<'a>(parser: Str) -> Box<dyn Parse<String, Token, &'a str> +
    });
 }
 
-fn map_digit_parser<'a> (digits: Digits) -> Box<dyn Parse<String, Token, &'a str> + 'a> {
+fn map_digit_parser<'a> (digits: Digits) -> TokenParser<'a> {
    map_result(digits, 
       |result: ParserResult<String>| {
          let res: TokenRes = match result {
@@ -68,9 +68,9 @@ fn map_digit_parser<'a> (digits: Digits) -> Box<dyn Parse<String, Token, &'a str
 
 pub fn main() {
    // Get the digits and convert it to Token type
-   let digits: Box<dyn Parse<String, Token, &str>> = map_digit_parser(Digits::new());
+   let digits: TokenParser = map_digit_parser(Digits::new());
 
-   let space: TokenParseTrait = map_string_parser(Str::new(" ".to_owned()));
+   let space: TokenParser = map_string_parser(Str::new(" ".to_owned()));
 
    // Create a parser for each mathematical operation
    let add = Str::new("+".to_owned());
@@ -78,7 +78,7 @@ pub fn main() {
    let multiply = Str::new("*".to_owned());
    let divide = Str::new("/".to_owned());
 
-   let expr: TokenChoice = Choice::new(vec![digits]);
+   let expr: TokenChoice = Choice::new(vec![Box::new(digits)]);
    let expr: Ptr<TokenChoice> = Rc::new(RefCell::new(expr));
    let expr_2: Ptr<TokenChoice> = Rc::clone(&expr);
    let expr_parser: TokenParser = Parser::new(
@@ -95,8 +95,8 @@ pub fn main() {
       }
    );
 
-   let space_prefix_expr: TokenParseTrait = map_result(
-      SequenceOf::new(vec![space, expr_parser]),
+   let space_prefix_expr: TokenParser = map_result(
+      SequenceOf::new(vec![Box::new(space), Box::new(expr_parser)]),
       |res: ParserResult<Token>| {
          match res {
             Some(Ok(Cardinality::Many(res))) => Some(Ok(One(res[1].clone()))),
@@ -113,7 +113,7 @@ pub fn main() {
       Box::new(divide)
    ]);
 
-   let operator: TokenParseTrait = map_result(operator, 
+   let operator: TokenParser = map_result(operator, 
       |result: ParserResult<String>| {
          use Token::Op;
          use Operation::{Add, Minus, Multiply, Divide};
@@ -134,16 +134,16 @@ pub fn main() {
       });
 
    let operation_sequence: TokenSeq = SequenceOf::new(vec![
-         operator,
+         Box::new(operator),
          Box::new(ManyOne::new(space_prefix_expr)) // TODO: change to: at_least_two
       ]);
 
-   let left_bracket: TokenParseTrait = map_string_parser(Str::new("(".to_owned()));
-   let right_bracket: TokenParseTrait = map_string_parser(Str::new(")".to_owned()));
+   let left_bracket: TokenParser = map_string_parser(Str::new("(".to_owned()));
+   let right_bracket: TokenParser = map_string_parser(Str::new(")".to_owned()));
 
    let operation = Between::new(
-      left_bracket,
-      right_bracket,
+      Box::new(left_bracket),
+      Box::new(right_bracket),
       Box::new(operation_sequence));
 
    expr.borrow_mut().push_parser(Box::new(operation));

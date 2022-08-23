@@ -1,5 +1,6 @@
 use std::fmt::{Debug, self};
 
+use crate::models::parser::Parser;
 use crate::models::parser_traits::Parse;
 use crate::models::state::{ State, ParserResult };
 use crate::parser_helpers::map_result;
@@ -9,7 +10,7 @@ use crate::utility::local_log;
 
 #[derive(Debug)]
 pub struct Between<'a,R1,R2,T> {
-   parser: Box<dyn Parse<R1,R2,T> + 'a>
+   parser: Parser<'a,R1,R2,T>
 }
 
 impl<'a, R1,R2,T> Between<'a,R1,R2,T> 

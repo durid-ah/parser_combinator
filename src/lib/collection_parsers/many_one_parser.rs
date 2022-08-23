@@ -3,6 +3,7 @@ use crate::models::parser_traits::Parse;
 use crate::models::state::State;
 use crate::utility::local_log;
 use std::fmt;
+use std::marker::PhantomData;
 use std::rc::Rc;
 
 /// # ManyOne:
@@ -25,26 +26,33 @@ use std::rc::Rc;
 /// use parser_combinator::models::parser_traits::Parse;
 ///
 /// let str_parser = Str::new("Test".to_owned());
-/// let many = ManyOne::new(Box::new(str_parser));
+/// let many = ManyOne::new(str_parser);
 /// let result = many.run("TestTestTest");
 /// assert!(result.result.is_some());
 /// assert_eq!(result.result.unwrap().unwrap().unwrap_many().len(), 3);
 /// assert_eq!(result.index, 12);
 /// ```
 #[derive(Debug)]
-pub struct ManyOne<R1, R2, T> {
-    parser: Box<dyn Parse<R1, R2, T>>,
+pub struct ManyOne<I, R1, R2, T>
+    where I: Parse<R1, R2, T> {
+        parser: I,
+        _p1: PhantomData<R1>,
+        _p2: PhantomData<R2>,
+        _p3: PhantomData<T>,
 }
 
-impl<R1, R2, T> ManyOne<R1, R2, T> {
-    pub fn new(parser: Box<dyn Parse<R1, R2, T>>) -> Self {
-        Self { parser }
+impl<I, R1, R2, T> ManyOne<I, R1, R2, T> 
+    where I: Parse<R1, R2, T> {
+
+    pub fn new(parser: I) -> Self {
+        Self { parser, _p1: PhantomData, _p2: PhantomData, _p3: PhantomData }
     }
 }
 
-impl<R1, R2, T> Parse<R1, R2, T> for ManyOne<R1, R2, T> 
-   where R1: fmt::Debug, R2: fmt::Debug, T: fmt::Debug {
-    
+impl<I, R1, R2, T> Parse<R1, R2, T> for ManyOne<I, R1, R2, T> 
+    where R1: fmt::Debug, R2: fmt::Debug, T: fmt::Debug, 
+        I: Parse<R1,R2,T> {    
+
    fn transform(&self, state: State<R1, T>) -> State<R2, T> {
       local_log::log(format!("{}", "ManyOne"));
       local_log::start_scope();
@@ -106,7 +114,7 @@ mod tests {
     #[test]
     fn many_one_parser_full_run() {
         let str_parser = Str::new("Test".to_owned());
-        let many_one = ManyOne::new(Box::new(str_parser));
+        let many_one = ManyOne::new(str_parser);
         let result = many_one.run("TestTestTest");
         
         assert!(result.result.is_some());
@@ -117,7 +125,7 @@ mod tests {
     #[test]
     fn many_one_parser_partial_parse() {
         let str_parser = Str::new("Test".to_owned());
-        let many_one = ManyOne::new(Box::new(str_parser));
+        let many_one = ManyOne::new(str_parser);
         let result = many_one.run("TestStuffTest");
         assert!(result.result.is_some());
         assert_eq!(result.result.unwrap().unwrap().unwrap_many().len(), 1);
@@ -127,7 +135,7 @@ mod tests {
     #[test]
     fn many_one_parser_zero_fail() {
         let str_parser = Str::new("Test".to_owned());
-        let many_one = ManyOne::new(Box::new(str_parser));
+        let many_one = ManyOne::new(str_parser);
         let result = many_one.run("StuffTest");
         assert!(result.result.is_some());
         assert!(result.result.unwrap().is_err());
