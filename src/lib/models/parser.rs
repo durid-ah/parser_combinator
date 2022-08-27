@@ -53,7 +53,6 @@ impl<'a, R1, R2, T> Parse<R1, R2, T> for Parser<'a, R1, R2, T> {
 }
 
 
-
 #[cfg(test)]
 mod tests {
     use crate::models::{state::State, cardinality::Cardinality};

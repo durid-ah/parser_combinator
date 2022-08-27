@@ -7,13 +7,15 @@ pub type  ParserResult<R> = Option<Result<Cardinality<R>, String>>;
 /// Represents the state returned from the parser 
 #[derive(Clone)]
 pub struct State<R, T> {
+   /// The index where the parser will start from
    pub index: usize,
+   /// The target data that will be parsed
    pub target: Rc<T>,
    pub result: ParserResult<R>
 }
 
 impl<R: Debug, T: Debug> State<R, T> {
-
+   // Create an error from the existing state
    pub fn new_err<R2>(self, err: String) -> State<R2, T> {
       State {
          index : self.index,

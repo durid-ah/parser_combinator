@@ -5,6 +5,7 @@ use regex::Regex;
 use crate::models::{parser_traits::Parse, state::State};
 use crate::models::cardinality::Cardinality::One;
 
+/// # Letters
 #[derive(Clone)]
 pub struct Letters {
    regex_matcher: Regex

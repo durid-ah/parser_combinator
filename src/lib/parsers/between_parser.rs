@@ -8,6 +8,12 @@ use crate::models::cardinality::Cardinality;
 use crate::collection_parsers::sequence_of_parser::SequenceOf;
 use crate::utility::local_log;
 
+/// # Between
+/// Parse the value(s) between two other parsers
+/// 
+/// ### Returns:
+/// The result of the middle parser (value) or the error returned by any of the
+/// parsers (left, value, right)
 #[derive(Debug)]
 pub struct Between<'a,R1,R2,T> {
    parser: Parser<'a,R1,R2,T>

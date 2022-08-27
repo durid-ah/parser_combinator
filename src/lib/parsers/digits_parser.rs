@@ -8,6 +8,7 @@ use crate::utility::local_log;
 
 use super::str_parser::StringState;
 
+/// # Digits:
 #[derive(Clone)]
 pub struct Digits {
    regex_matcher: Regex

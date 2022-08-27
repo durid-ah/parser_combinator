@@ -2,6 +2,8 @@ use std::{rc::Rc, fmt::Debug};
 use super::state::State;
 
 
+/// # Parse
+/// Trait used by the parsers to ensure they interoperate with each other
 pub trait Parse<R1,R2,T>: Debug {
    fn transform(&self, state: State<R1, T>) -> State<R2, T>;
    fn run(&self, target: T) -> State<R2, T> {
@@ -9,16 +11,3 @@ pub trait Parse<R1,R2,T>: Debug {
       self.transform(initial_state)
    }
 }
-
-
-
-// pub trait Chain {
-//    type R2;
-//    type T;
-//    type E1;
-//    type E2;
-//    type P : Parser;
-
-//    fn chain<S, F>(&self, chain_fn: F) -> Self::P
-//       where F: FnMut(ParserResult<Self::R2, Self::E2>) -> Box<dyn Parser<R1=Self::R2, R2=S, T=Self::T, E1 = Self::E1, E2 = Self::E2>>;
-// }

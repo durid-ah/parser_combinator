@@ -7,6 +7,8 @@ use crate::utility::local_log;
 
 pub type StringState<'state> = State<String, &'state str>;
 
+/// # Str:
+/// Parse a specific string in the target
 #[derive(Clone, Debug)]
 pub struct  Str {
    pub to_match: String
