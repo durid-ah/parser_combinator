@@ -29,3 +29,7 @@ Parsers used to handle a collection of parsers
 * **Many/ManyOne**: Used to find as many instances of the parser in sequence. ManyOne ensures that at least one parser is successful while Many returns successful with zero instances.
 
 * **SepBy/SepByOne**: Takes in a separator and a separated parser and looks for multiple instances of the separated value with separator in between each. Just like **ManyOne**, **SepByOne** is used to catch at least one separated value while **SepBy** only has one.
+
+## Bit Parsers:
+
+Coming Soon...
