@@ -6,7 +6,6 @@ use crate::models::state::{ State, ParserResult };
 use crate::parser_helpers::map_result;
 use crate::models::cardinality::Cardinality;
 use crate::collection_parsers::sequence_of_parser::SequenceOf;
-use crate::utility::local_log;
 
 /// # Between
 /// Parse the value(s) between two other parsers
@@ -48,16 +47,9 @@ impl<'a, R1,R2,T> Between<'a,R1,R2,T>
 impl<'a,R1,R2,T> Parse<R1,R2,T> for Between<'a,R1,R2,T>  
    where R1: fmt::Debug, R2: fmt::Debug, T: fmt::Debug {
 
-   fn transform(&self, state: State<R1, T>) -> State<R2, T> {
-      local_log::log(format!("{}", "Between"));
-      local_log::start_scope();
-      local_log::log(format!("{:?}", state));
-      
+   fn transform(&self, state: State<R1, T>) -> State<R2, T> {      
       let res = self.parser.transform(state);
       
-      local_log::log(format!("{:?}", res));
-      local_log::end_scope();
-
       res
    }
 }

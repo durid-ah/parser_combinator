@@ -1,9 +1,6 @@
 use std::{rc::Rc, fmt};
 
-use crate::{
-   models::{parser_traits::Parse, state::State}, 
-   utility::local_log
-};
+use crate::models::{parser_traits::Parse, state::State};
 
 /// # Choice
 /// Goes the through the provided parsers and completes as soon as
@@ -51,14 +48,10 @@ impl<R1,R2,T> Parse<R1,R2,T> for Choice<R1,R2,T>
    where R1: fmt::Debug, R2: fmt::Debug, T: fmt::Debug {
 
    fn transform(&self, state: State<R1, T>) -> State<R2, T> {
-      local_log::log(format!("{}", "Choice"));
-      local_log::start_scope();
 
       let contains_error = state.is_error();
 
       if contains_error {
-         local_log::log(format!("{:?}", state));
-         local_log::end_scope();
 
          return State::from_err_state(state)
       }
@@ -73,12 +66,7 @@ impl<R1,R2,T> Parse<R1,R2,T> for Choice<R1,R2,T>
          let next = parser.transform(final_state);
 
          match next.result.as_ref().unwrap() {
-            Ok(_) => {
-               local_log::log(format!("{:?}", next));
-               local_log::end_scope();
-
-               return next
-            },
+            Ok(_) => return next,
             _ => {
                final_state = State {
                   index: state.index,
@@ -95,9 +83,6 @@ impl<R1,R2,T> Parse<R1,R2,T> for Choice<R1,R2,T>
          target: Rc::clone(&state.target),
          result: Some(Err("Choice: Failed to parse any of the provided choices".to_owned()))
       };
-
-      local_log::log(format!("{:?}", res));
-      local_log::end_scope();
       
       res
    }

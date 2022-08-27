@@ -3,7 +3,6 @@ use std::rc::Rc;
 use crate::models::parser_traits::Parse;
 use crate::models::state::State;
 use crate::models::cardinality::Cardinality;
-use crate::utility::local_log;
 
 pub type StringState<'state> = State<String, &'state str>;
 
@@ -24,14 +23,10 @@ impl Str {
 impl Parse<String,String,&str> for Str {
 
    fn transform<'s>(&self, state: StringState<'s>) -> StringState<'s> {
-      local_log::log(format!("{:?}", self));
-      local_log::start_scope();
 
       let contains_error = state.is_error();
          
       if contains_error {
-         local_log::log(format!("{:?}", state));
-         local_log::end_scope();
          return state;
       }
 
@@ -39,9 +34,6 @@ impl Parse<String,String,&str> for Str {
       let sliced_target = &state.target[start_index..];
       if sliced_target.is_empty() {
          let err_state = state.new_err(String::from("Str: Unexpected end of input"));
-         
-         local_log::log(format!("{:?}", err_state));
-         local_log::end_scope();
 
          return err_state;
       }
@@ -53,9 +45,6 @@ impl Parse<String,String,&str> for Str {
             result: Some(Ok(Cardinality::One(self.to_match.clone())))
          };
 
-         local_log::log(format!("{:?}", res));
-         local_log::end_scope();
-
          return res;
       }
 
@@ -64,9 +53,6 @@ impl Parse<String,String,&str> for Str {
          target: Rc::clone(&state.target),
          result: Some(Err(format!("Str: Tried to match {}, but got {}", self.to_match, state.target)))
       };
-
-      local_log::log(format!("{:?}", res));
-      local_log::end_scope();
 
       return res;
    }

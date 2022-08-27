@@ -4,7 +4,6 @@ use regex::Regex;
 
 use crate::models::{parser_traits::Parse, state::State};
 use crate::models::cardinality::Cardinality::One;
-use crate::utility::local_log;
 
 use super::str_parser::StringState;
 
@@ -31,10 +30,7 @@ impl fmt::Debug for Digits {
 }
 
 impl Parse<String,String,&str> for Digits {
-   fn transform<'s>(&self, state: StringState<'s>) -> StringState<'s> {
-      local_log::log(format!("{:?}", self));
-      local_log::start_scope();
-      
+   fn transform<'s>(&self, state: StringState<'s>) -> StringState<'s> {      
       let contains_error = state.is_error();
 
       if contains_error {
@@ -48,8 +44,6 @@ impl Parse<String,String,&str> for Digits {
             result: Some(Err("Digits: Unexpected end of input".to_owned()))
          };
 
-         local_log::log(format!("{:?}", state));
-         local_log::end_scope();
          return state;
       }
 
@@ -62,9 +56,6 @@ impl Parse<String,String,&str> for Digits {
             result: Some(Err(format!("Digits: No digits were matched at index: {}", state.index)))
          };
 
-         local_log::log(format!("{:?}", state));
-         local_log::end_scope();
-
          return state;
       }
 
@@ -74,9 +65,6 @@ impl Parse<String,String,&str> for Digits {
          target: state.target.clone(),
          result: Some(Ok(One(match_val.as_str().to_owned()))) 
       };
-
-      local_log::log(format!("{:?}", state));
-      local_log::end_scope();
 
       return state;
    }

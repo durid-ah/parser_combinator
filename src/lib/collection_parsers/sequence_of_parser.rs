@@ -2,7 +2,6 @@ use std::fmt::{Debug, self};
 use std::rc::Rc;
 use crate::models::{parser_traits::Parse, state::State};
 use crate::models::cardinality::Cardinality::{One, Many};
-use crate::utility::local_log;
 
 
 /// # SequenceOf:
@@ -54,13 +53,8 @@ impl<R1,R2,T> Parse<R1,R2,T> for SequenceOf<R1,R2,T>
       
    fn transform(&self, state: State<R1, T>) -> State<R2, T> {
       let contains_error = state.is_error();
-      local_log::log(format!("{}", "SequenceOf"));
-      local_log::start_scope();
 
-      if contains_error {
-         local_log::log(format!("{:?}", state));
-         local_log::end_scope();
-         
+      if contains_error {         
          return State::from_err_state(state)
       }
 
@@ -87,9 +81,6 @@ impl<R1,R2,T> Parse<R1,R2,T> for SequenceOf<R1,R2,T>
                   result: Some(Err(err))
                };
 
-               local_log::log(format!("{:?}", err_state));
-               local_log::end_scope();
-
                return err_state;
             }
          }
@@ -108,9 +99,6 @@ impl<R1,R2,T> Parse<R1,R2,T> for SequenceOf<R1,R2,T>
          result: Some(Ok(Many(results))) 
       };
 
-      local_log::log(format!("{:?}", res));
-      local_log::end_scope();
-      
       res
    }
 }

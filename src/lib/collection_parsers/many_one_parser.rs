@@ -1,7 +1,6 @@
 use crate::models::cardinality::Cardinality;
 use crate::models::parser_traits::Parse;
 use crate::models::state::State;
-use crate::utility::local_log;
 use std::fmt;
 use std::marker::PhantomData;
 use std::rc::Rc;
@@ -54,8 +53,6 @@ impl<I, R1, R2, T> Parse<R1, R2, T> for ManyOne<I, R1, R2, T>
         I: Parse<R1,R2,T> {    
 
    fn transform(&self, state: State<R1, T>) -> State<R2, T> {
-      local_log::log(format!("{}", "ManyOne"));
-      local_log::start_scope();
 
       let mut results: Vec<R2> = Vec::new();
       let target = Rc::clone(&state.target);
@@ -86,9 +83,6 @@ impl<I, R1, R2, T> Parse<R1, R2, T> for ManyOne<I, R1, R2, T>
          let err_state = final_state
             .new_err("ManyOne: Unable to match any input using parser @ index".to_owned());
 
-         local_log::log(format!("{:?}", err_state));
-         local_log::end_scope();
-
          return err_state;
       }
 
@@ -98,8 +92,6 @@ impl<I, R1, R2, T> Parse<R1, R2, T> for ManyOne<I, R1, R2, T>
          result: Some(Ok(Cardinality::Many(results))),
       };
 
-      local_log::log(format!("{:?}", res));
-      local_log::end_scope();
 
       res
    }
