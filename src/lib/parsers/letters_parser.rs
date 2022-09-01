@@ -71,7 +71,7 @@ mod tests {
     use super::Letters;
 
    #[test]
-   fn digit_success_run() {
+   fn letters_success_run() {
       let p = Letters::new();
       let res = p.run("abcd1s".to_owned());
       assert!(res.result.unwrap().unwrap().unwrap_one() == "abcd");
@@ -79,7 +79,7 @@ mod tests {
    }
 
    #[test]
-   fn digit_fail_run() {
+   fn letters_fail_run() {
       let p = Letters::new();
       let res = p.run("123s".to_owned());
       assert!(res.result.unwrap().is_err());
