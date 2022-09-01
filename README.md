@@ -60,20 +60,51 @@ Parsers used to handle a collection of parsers
 * **SequenceOf**: Takes in a sequence of parsers and ensures that they are executed in the right order
 
 ```rust
+   let s1 = Box::new(Str::new("Test1".to_owned()));
+   let s2 = Box::new(Str::new("Test2".to_owned()));
+   let seq = SequenceOf::new(vec![s1,s2]);
+   let result = seq.run("Test1Test2");
+
+   assert!(result.result.is_some());
+   assert_eq!(result.result.unwrap().unwrap().unwrap_many().len(), 2);
+   assert_eq!(result.index, 10);
 ```
 * **Choice**: Finds the first matching parser in a collection of parsers
 
 ```rust
+   let s1 = Box::new(Str::new("Test1".to_owned()));  
+   let s2 = Box::new(Str::new("Test2".to_owned()));  
+   let s3 = Box::new(Str::new("Test3".to_owned()));  
+      
+   let choice = Choice::new(vec![s1,s2,s3]);
+   let res = choice.run("Test2");
+
+   assert_eq!(res.result.unwrap().unwrap().unwrap_one(), "Test2");
+   assert_eq!(res.index, 5);
 ```
 
 * **Many/ManyOne**: Used to find as many instances of the parser in sequence. ManyOne ensures that at least one parser is successful while Many returns successful with zero instances.
 
 ```rust
+   let str_parser = Str::new("Test".to_owned());
+   let many = Many::new(str_parser);
+   let result = many.run("TestTestTest");
+   assert!(result.result.is_some());
+   assert_eq!(result.result.unwrap().unwrap().unwrap_many().len(), 3);
+   assert_eq!(result.index, 12);
 ```
 
 * **SepBy/SepByOne**: Takes in a separator and a separated parser and looks for multiple instances of the separated value with separator in between each. Just like **ManyOne**, **SepByOne** is used to catch at least one separated value while **SepBy** only has one.
 
 ```rust
+   let comma = Str::new(",".to_owned());
+   let test_string = Str::new("Test".to_owned());
+   let sep_parser = SepBy::new(comma, test_string);
+   let result = sep_parser.run("Test,Test,Test");
+
+   assert!(result.result.is_some());
+   assert_eq!(result.result.unwrap().unwrap().unwrap_many().len(), 3);
+   assert_eq!(result.index, 14);
 ```
 
 ## Bit Parsers:
